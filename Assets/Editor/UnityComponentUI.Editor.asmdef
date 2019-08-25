@@ -1,0 +1,16 @@
+{
+    "name": "UnityComponentUI.Editor",
+    "references": [
+        "GUID:131ec3accf5dd0149a69145793009b5e"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}
