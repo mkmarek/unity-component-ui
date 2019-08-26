@@ -1,11 +1,19 @@
-﻿using System.Data;
-using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using Assets.Editor.Language.AST;
 
 namespace Assets.Editor.Language
 {
     public class Parser
     {
+        private readonly Assembly systemAssembly;
+
+        public Parser()
+        {
+            systemAssembly = Assembly.GetAssembly(typeof(Int32));
+        }
+
         public ASTDocument Parse(string source)
         {
             var document = new ASTDocument();
@@ -13,17 +21,61 @@ namespace Assets.Editor.Language
 
             var token = lexer.NextToken();
 
+            if (token.Kind == TokenKind.NAME && token.Value == "props")
+            {
+                Check(lexer, TokenKind.COLON);
+                document.Props = this.ParseProps(lexer);
+                token = lexer.NextToken();
+            }
+
             if (token.Kind == TokenKind.NAME && token.Value == "template")
             {
                 Check(lexer, TokenKind.COLON);
                 document.Template = this.ParseTemplate(lexer);
             }
-            else
-            {
-                throw new CSLSyntaxErrorException($"Expected template got {token}", token.Start);
-            }
 
             return document;
+        }
+
+        private List<ASTPropDefinition> ParseProps(Lexer lexer)
+        {
+            var result = new List<ASTPropDefinition>();
+
+            Check(lexer, TokenKind.BRACE_L);
+
+            var token = lexer.NextToken();
+
+            while (token.Kind != TokenKind.BRACE_R)
+            {
+                result.Add(this.ParseProp(token, lexer));
+                token = lexer.NextToken();
+            }
+
+            return result;
+        }
+
+        private ASTPropDefinition ParseProp(Token currentToken, Lexer lexer)
+        {
+            if (currentToken.Kind != TokenKind.NAME)
+            {
+                throw new CSLSyntaxErrorException($"Expected name of the prop got {currentToken}", currentToken.Start);
+            }
+
+            var prop = new ASTPropDefinition();
+            prop.Name = currentToken.Value;
+
+            Check(lexer, TokenKind.COLON);
+
+            currentToken = lexer.NextToken();
+
+            if (currentToken.Kind != TokenKind.NAME && currentToken.Kind != TokenKind.STRING)
+            {
+                throw new CSLSyntaxErrorException($"Expected type of the prop got {currentToken}", currentToken.Start);
+            }
+
+            prop.Type = systemAssembly.GetType(currentToken.Value);
+
+            return prop;
         }
 
         private ASTTemplateDefinition ParseTemplate(Lexer lexer)

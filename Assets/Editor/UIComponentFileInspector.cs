@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Linq;
+using UnityEditor;
 
 namespace Assets.Editor
 {
@@ -9,7 +10,14 @@ namespace Assets.Editor
     {
         public override void OnInspectorGUI()
         {
-            GUILayout.Button("fdsfsdfs");
+            var component = (UIComponent)this.target;
+
+            GUILayout.Label("Component name: " + component.ComponentName);
+            GUILayout.Label("Root component id: " + component.RootId);
+            GUILayout.Label("Components used:");
+            GUILayout.Box(string.Join(
+                "\n",
+                component.Elements?.Select(e => $"{e.ComponentName} ({e.Id})") ?? new string[] {}));
         }
     }
 }

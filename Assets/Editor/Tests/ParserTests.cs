@@ -1,4 +1,5 @@
-﻿using Assets.Editor.Language;
+﻿using System;
+using Assets.Editor.Language;
 using NUnit.Framework;
 
 namespace Tests
@@ -79,6 +80,54 @@ template: {
             Assert.AreEqual("Nested4", ast.Template.RootNode.Children[2].Children[0].Name);
             Assert.AreEqual("Nested5", ast.Template.RootNode.Children[2].Children[1].Name);
             Assert.AreEqual("Nested6", ast.Template.RootNode.Children[2].Children[1].Children[0].Name);
+        }
+
+        [Test]
+        public void TemplateWithOneComponentAndOneProp()
+        {
+            var ast = parser.Parse(@"
+props: {
+    iterations: ""System.Int32""
+}
+template: {
+    <Container />
+}");
+            Assert.AreEqual("Container", ast.Template.RootNode.Name);
+
+            Assert.AreEqual("iterations", ast.Props[0].Name);
+            Assert.AreEqual(typeof(Int32), ast.Props[0].Type);
+        }
+
+        [Test]
+        public void TemplateWithOneComponentAndMultipleProps()
+        {
+            var ast = parser.Parse(@"
+props: {
+    someInt: ""System.Int32""
+    someString: ""System.String""
+    someSingle: ""System.Single""
+    someDouble: ""System.Double""
+    someDateTime: ""System.DateTime""
+}
+template: {
+    <Container />
+}");
+            Assert.AreEqual("Container", ast.Template.RootNode.Name);
+
+            Assert.AreEqual("someInt", ast.Props[0].Name);
+            Assert.AreEqual(typeof(Int32), ast.Props[0].Type);
+
+            Assert.AreEqual("someString", ast.Props[1].Name);
+            Assert.AreEqual(typeof(String), ast.Props[1].Type);
+
+            Assert.AreEqual("someSingle", ast.Props[2].Name);
+            Assert.AreEqual(typeof(Single), ast.Props[2].Type);
+
+            Assert.AreEqual("someDouble", ast.Props[3].Name);
+            Assert.AreEqual(typeof(Double), ast.Props[3].Type);
+
+            Assert.AreEqual("someDateTime", ast.Props[4].Name);
+            Assert.AreEqual(typeof(DateTime), ast.Props[4].Type);
         }
     }
 }

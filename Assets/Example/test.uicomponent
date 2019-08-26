@@ -1,11 +1,3 @@
-props: {
-    iterations: Int32
-}
 template: {
-    <Container>
-    {
-        for i : 0..interations then
-            <Component />
-    }
-    </Container>
+    <Panel><Stuff><x/></Stuff></Panel>
 }

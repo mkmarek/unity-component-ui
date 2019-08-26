@@ -8,6 +8,12 @@ namespace Assets.Editor.Language.AST
 {
     public class ASTDocument
     {
+        public ASTDocument()
+        {
+            Props = new List<ASTPropDefinition>();
+        }
+
         public ASTTemplateDefinition Template { get; set; }
+        public List<ASTPropDefinition> Props { get; set; }
     }
 }

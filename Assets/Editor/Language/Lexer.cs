@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Assets.Editor.Language
 {
@@ -101,12 +102,14 @@ namespace Assets.Editor.Language
             var start = this.currentIndex;
             var value = this.ProcessStringChunks();
 
+            this.currentIndex++;
+
             return new Token()
             {
                 Kind = TokenKind.STRING,
                 Value = value,
                 Start = start,
-                End = this.currentIndex + 1
+                End = this.currentIndex
             };
         }
 
