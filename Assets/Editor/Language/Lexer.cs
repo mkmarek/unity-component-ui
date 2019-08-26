@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Assets.Editor.Parser
+namespace Assets.Editor.Language
 {
     public class Lexer
     {
@@ -17,11 +17,7 @@ namespace Assets.Editor.Parser
             this.source = source;
         }
 
-        public void Dispose()
-        {
-        }
-
-        public Token GetToken()
+        public Token NextToken()
         {
             if (this.source == null)
                 return this.CreateEOFToken();
@@ -51,7 +47,7 @@ namespace Assets.Editor.Parser
                 return this.ReadString();
 
             throw new CSLSyntaxErrorException(
-                $"Unexpected character {this.ResolveCharName(code, unicode)}", this.source, this.currentIndex);
+                $"Unexpected character {this.ResolveCharName(code, unicode)}", this.currentIndex);
         }
 
         public bool OnlyHexInString(string test)
@@ -75,7 +71,7 @@ namespace Assets.Editor.Parser
             if (nextCode >= 48 && nextCode <= 57)
             {
                 throw new CSLSyntaxErrorException(
-                    $"Invalid number, unexpected digit after {code}: \"{nextCode}\"", this.source, this.currentIndex);
+                    $"Invalid number, unexpected digit after {code}: \"{nextCode}\"", this.currentIndex);
             }
 
             code = nextCode;
@@ -138,7 +134,7 @@ namespace Assets.Editor.Parser
                 case 't': value += '\t'; break;
                 case 'u': value += this.GetUnicodeChar(); break;
                 default:
-                    throw new CSLSyntaxErrorException($"Invalid character escape sequence: \\{code}.", this.source, this.currentIndex);
+                    throw new CSLSyntaxErrorException($"Invalid character escape sequence: \\{code}.", this.currentIndex);
             }
 
             return value;
@@ -154,7 +150,7 @@ namespace Assets.Editor.Parser
             if (code < 0x0020 && code != 0x0009)
             {
                 throw new CSLSyntaxErrorException(
-                    $"Invalid character within String: \\u{((int)code).ToString("D4")}.", this.source, this.currentIndex);
+                    $"Invalid character within String: \\u{((int)code).ToString("D4")}.", this.currentIndex);
             }
         }
 
@@ -199,7 +195,7 @@ namespace Assets.Editor.Parser
         {
             if (code != '"')
             {
-                throw new CSLSyntaxErrorException("Unterminated string.", this.source, this.currentIndex);
+                throw new CSLSyntaxErrorException("Unterminated string.", this.currentIndex);
             }
         }
 
@@ -304,7 +300,7 @@ namespace Assets.Editor.Parser
 
             if (!this.OnlyHexInString(expression.Substring(1)))
             {
-                throw new CSLSyntaxErrorException($"Invalid character escape sequence: \\{expression}.", this.source, this.currentIndex);
+                throw new CSLSyntaxErrorException($"Invalid character escape sequence: \\{expression}.", this.currentIndex);
             }
 
             var character = (char)(
@@ -379,7 +375,7 @@ namespace Assets.Editor.Parser
             if (!char.IsNumber(code))
             {
                 throw new CSLSyntaxErrorException(
-                    $"Invalid number, expected digit but got: {this.ResolveCharName(code)}", this.source, this.currentIndex);
+                    $"Invalid number, expected digit but got: {this.ResolveCharName(code)}", this.currentIndex);
             }
 
             do
@@ -431,7 +427,7 @@ namespace Assets.Editor.Parser
             if (code < 0x0020 && code != 0x0009 && code != 0x000A && code != 0x000D)
             {
                 throw new CSLSyntaxErrorException(
-                    $"Invalid character \"\\u{code.ToString("D4")}\".", this.source, this.currentIndex);
+                    $"Invalid character \"\\u{code.ToString("D4")}\".", this.currentIndex);
             }
         }
 

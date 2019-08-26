@@ -1,9 +1,9 @@
-﻿using Assets.Editor.Parser;
+﻿using Assets.Editor.Language;
 using NUnit.Framework;
 
 namespace Tests
 {
-    public class TokenizerTests
+    public class LexerTests
     {
         [Test]
         public void TemplateWithOneComponent()
@@ -14,33 +14,95 @@ template: {
 }
 ", 0);
 
-            var next = lexer.GetToken();
+            var next = lexer.NextToken();
             Assert.AreEqual(TokenKind.NAME, next.Kind);
             Assert.AreEqual("template", next.Value);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.COLON, next.Kind);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.BRACE_L, next.Kind);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.LT, next.Kind);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.NAME, next.Kind);
             Assert.AreEqual("Container", next.Value);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.FWD_SLASH, next.Kind);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.GT, next.Kind);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.BRACE_R, next.Kind);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
+            Assert.AreEqual(TokenKind.EOF, next.Kind);
+        }
+
+        [Test]
+        public void TemplateWithNesterComponent()
+        {
+            var lexer = new Lexer(@"
+template: {
+    <Container><Nested /></Container>
+}
+", 0);
+
+            var next = lexer.NextToken();
+            Assert.AreEqual(TokenKind.NAME, next.Kind);
+            Assert.AreEqual("template", next.Value);
+
+            next = lexer.NextToken();
+            Assert.AreEqual(TokenKind.COLON, next.Kind);
+
+            next = lexer.NextToken();
+            Assert.AreEqual(TokenKind.BRACE_L, next.Kind);
+
+            next = lexer.NextToken();
+            Assert.AreEqual(TokenKind.LT, next.Kind);
+
+            next = lexer.NextToken();
+            Assert.AreEqual(TokenKind.NAME, next.Kind);
+            Assert.AreEqual("Container", next.Value);
+
+            next = lexer.NextToken();
+            Assert.AreEqual(TokenKind.GT, next.Kind);
+
+            next = lexer.NextToken();
+            Assert.AreEqual(TokenKind.LT, next.Kind);
+
+            next = lexer.NextToken();
+            Assert.AreEqual(TokenKind.NAME, next.Kind);
+            Assert.AreEqual("Nested", next.Value);
+
+            next = lexer.NextToken();
+            Assert.AreEqual(TokenKind.FWD_SLASH, next.Kind);
+
+            next = lexer.NextToken();
+            Assert.AreEqual(TokenKind.GT, next.Kind);
+
+            next = lexer.NextToken();
+            Assert.AreEqual(TokenKind.LT, next.Kind);
+
+            next = lexer.NextToken();
+            Assert.AreEqual(TokenKind.FWD_SLASH, next.Kind);
+
+            next = lexer.NextToken();
+            Assert.AreEqual(TokenKind.NAME, next.Kind);
+            Assert.AreEqual("Container", next.Value);
+
+            next = lexer.NextToken();
+            Assert.AreEqual(TokenKind.GT, next.Kind);
+
+            next = lexer.NextToken();
+            Assert.AreEqual(TokenKind.BRACE_R, next.Kind);
+
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.EOF, next.Kind);
         }
 
@@ -56,57 +118,57 @@ template: {
 }
 ", 0);
 
-            var next = lexer.GetToken();
+            var next = lexer.NextToken();
             Assert.AreEqual(TokenKind.NAME, next.Kind);
             Assert.AreEqual("props", next.Value);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.COLON, next.Kind);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.BRACE_L, next.Kind);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.NAME, next.Kind);
             Assert.AreEqual("iterations", next.Value);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.COLON, next.Kind);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.NAME, next.Kind);
             Assert.AreEqual("Int32", next.Value);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.BRACE_R, next.Kind);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.NAME, next.Kind);
             Assert.AreEqual("template", next.Value);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.COLON, next.Kind);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.BRACE_L, next.Kind);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.LT, next.Kind);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.NAME, next.Kind);
             Assert.AreEqual("Container", next.Value);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.FWD_SLASH, next.Kind);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.GT, next.Kind);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.BRACE_R, next.Kind);
 
-            next = lexer.GetToken();
+            next = lexer.NextToken();
             Assert.AreEqual(TokenKind.EOF, next.Kind);
         }
     }
