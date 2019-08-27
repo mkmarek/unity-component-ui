@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Assets.Engine;
 using Assets.Engine.Hierarchy;
 using Assets.Engine.Utils;
 using UnityEngine;
@@ -7,7 +8,7 @@ using UnityEngine;
 namespace Assets
 {
     [Serializable]
-    public class UIComponent : BaseUIComponent
+    public class UIComponent : ScriptableObject, IBaseUIComponent
     {
         [SerializeField]
         private string componentName;
@@ -36,9 +37,10 @@ namespace Assets
             set => rootId = value;
         }
 
-        public override void Render()
+        public void Render()
         {
-            throw new System.NotImplementedException();
+            var rootElement = elements.Find(e => e.Id == RootId);
+            rootElement.Render(ComponentPool.Instance);
         }
     }
 }

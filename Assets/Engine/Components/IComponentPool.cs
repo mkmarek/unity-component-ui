@@ -2,6 +2,6 @@
 {
     public interface IComponentPool
     {
-        BaseUIComponent GetComponentByName(string name);
+        IBaseUIComponent GetComponentByName(string name);
     }
 }
