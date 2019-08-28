@@ -18,6 +18,12 @@ namespace Assets.Editor.Language
             this.source = source;
         }
 
+        public Lexer(Lexer lexer)
+        {
+            this.currentIndex = lexer.currentIndex;
+            this.source = lexer.source;
+        }
+
         public Token NextToken()
         {
             if (this.source == null)
@@ -177,6 +183,7 @@ namespace Assets.Editor.Language
                 case '<': return this.CreatePunctuationToken(TokenKind.LT, 1);
                 case '>': return this.CreatePunctuationToken(TokenKind.GT, 1);
                 case '/': return this.CreatePunctuationToken(TokenKind.FWD_SLASH, 1);
+                case ';': return this.CreatePunctuationToken(TokenKind.SEMICOLON, 1);
                 default: return null;
             }
         }
@@ -191,7 +198,7 @@ namespace Assets.Editor.Language
                 return this.CreatePunctuationToken(TokenKind.SPREAD, 3);
             }
 
-            return null;
+            return this.CreatePunctuationToken(TokenKind.DOT, 1);
         }
 
         private void CheckStringTermination(char code)

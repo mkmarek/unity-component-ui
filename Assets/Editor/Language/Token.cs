@@ -28,7 +28,9 @@ namespace Assets.Editor.Language
         STRING = 18,
         LT = 19,
         GT = 20,
-        FWD_SLASH = 21
+        FWD_SLASH = 21,
+        SEMICOLON = 22,
+        DOT = 23
     }
 
     public class Token

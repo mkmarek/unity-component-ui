@@ -7,7 +7,7 @@ namespace Assets
         [SerializeField]
         private UIComponent rootComponent;
 
-        private void OnGUI()
+        private void Start()
         {
             rootComponent.Render();
         }

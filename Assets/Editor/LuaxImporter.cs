@@ -4,12 +4,12 @@ using UnityEditor.Experimental.AssetImporters;
 
 namespace Assets.Editor
 {
-    [ScriptedImporter(1, "uicomponent")]
-    public class UIComponentImporter : ScriptedImporter
+    [ScriptedImporter(1, "luax")]
+    public class LuaxImporter : ScriptedImporter
     {
         private readonly Interpreter interpreter;
 
-        public UIComponentImporter()
+        public LuaxImporter()
         {
             interpreter = new Interpreter();
         }

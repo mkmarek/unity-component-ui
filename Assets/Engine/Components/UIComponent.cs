@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Assets.Engine;
 using Assets.Engine.Hierarchy;
+using Assets.Engine.Render;
 using Assets.Engine.Utils;
+using MoonSharp.Interpreter;
 using UnityEngine;
 
 namespace Assets
@@ -14,10 +18,7 @@ namespace Assets
         private string componentName;
 
         [SerializeField]
-        private List<HierarchyElement> elements;
-
-        [SerializeField]
-        private string rootId;
+        private string markup;
 
         public string ComponentName
         {
@@ -25,22 +26,20 @@ namespace Assets
             set => componentName = value;
         }
 
-        public List<HierarchyElement> Elements
+        public string Markup
         {
-            get => elements;
-            set => elements = value;
-        }
-
-        public string RootId
-        {
-            get => rootId;
-            set => rootId = value;
+            get => markup;
+            set => markup = value;
         }
 
         public void Render()
         {
-            var rootElement = elements.Find(e => e.Id == RootId);
-            rootElement.Render(ComponentPool.Instance);
+            var script = new Script();
+
+            script.Globals["Create"] = (Func<string, IDictionary<string, object>, string>)Element.Create;
+
+            script.DoString(markup);
+            script.Call(script.Globals["render"]);
         }
     }
 }
