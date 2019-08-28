@@ -1,45 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Assets.Engine;
-using Assets.Engine.Hierarchy;
-using Assets.Engine.Render;
-using Assets.Engine.Utils;
 using MoonSharp.Interpreter;
 using UnityEngine;
 
-namespace Assets
+namespace Assets.Engine.Components
 {
-    [Serializable]
-    public class UIComponent : ScriptableObject, IBaseUIComponent
+    public class UIComponent : IBaseUIComponent
     {
-        [SerializeField]
-        private string componentName;
+        private Script state;
 
-        [SerializeField]
-        private string markup;
-
-        public string ComponentName
+        public UIComponent(Script state)
         {
-            get => componentName;
-            set => componentName = value;
+            this.state = state;
         }
 
-        public string Markup
+        public string Render()
         {
-            get => markup;
-            set => markup = value;
-        }
-
-        public void Render()
-        {
-            var script = new Script();
-
-            script.Globals["Create"] = (Func<string, IDictionary<string, object>, string>)Element.Create;
-
-            script.DoString(markup);
-            script.Call(script.Globals["render"]);
+            return state.Call(state.Globals["render"]).CastToString();
         }
     }
 }

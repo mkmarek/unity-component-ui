@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Assets.Engine.Components;
 using Assets.Engine.Components.Native;
 
@@ -25,19 +22,20 @@ namespace Assets.Engine
             }
         }
 
-        private Dictionary<string, IBaseUIComponent> components;
+        private Dictionary<string, Func<IBaseUIComponent>> components;
 
         public ComponentPool()
         {
-            components = new Dictionary<string, IBaseUIComponent>();
-            components.Add("Panel", new PanelComponent());
+            components = new Dictionary<string, Func<IBaseUIComponent>>();
+            components.Add("Panel", () => new PanelComponent());
+            components.Add("Button", () => new ButtonComponent());
         }
 
         public IBaseUIComponent GetComponentByName(string name)
         {
             if (components.ContainsKey(name))
             {
-                return components[name];
+                return components[name]();
             }
 
             return null;

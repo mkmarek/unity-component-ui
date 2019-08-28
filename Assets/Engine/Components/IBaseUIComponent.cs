@@ -5,6 +5,6 @@ namespace Assets
 {
     public interface IBaseUIComponent
     {
-        void Render();
+        string Render();
     }
 }
