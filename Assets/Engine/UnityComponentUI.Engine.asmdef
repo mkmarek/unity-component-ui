@@ -5,7 +5,10 @@
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
-    "precompiledReferences": [],
+    "precompiledReferences": [
+        "System.Runtime.Remoting.dll",
+        "MoonSharp.Interpreter.dll"
+    ],
     "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": []

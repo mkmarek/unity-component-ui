@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Engine.Render;
+using UnityEngine;
 
 namespace Assets.Engine.Components.Native
 {
@@ -8,5 +9,7 @@ namespace Assets.Engine.Components.Native
         {
             return null;
         }
+
+        public abstract void Render(ElementBuilder<GameObject> builder);
     }
 }

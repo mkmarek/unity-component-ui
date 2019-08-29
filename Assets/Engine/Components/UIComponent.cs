@@ -1,6 +1,4 @@
-﻿using System;
-using MoonSharp.Interpreter;
-using UnityEngine;
+﻿using MoonSharp.Interpreter;
 
 namespace Assets.Engine.Components
 {

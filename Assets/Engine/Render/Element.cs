@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 
 namespace Assets.Engine.Render
 {
@@ -35,12 +33,7 @@ namespace Assets.Engine.Render
 
         public static Element GetById(string id)
         {
-            if (elements.ContainsKey(id))
-            {
-                return elements[id];
-            }
-
-            return null;
+            return elements.ContainsKey(id) ? elements[id] : null;
         }
     }
 }

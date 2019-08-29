@@ -26,7 +26,6 @@ namespace Assets.Engine.Render
             while (stack.Count > 0)
             {
                 var element = stack.Pop();
-                Debug.Log(element);
 
                 if (element.Props?.ContainsKey("children") == false)
                 {
