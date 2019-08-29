@@ -1,10 +1,9 @@
-﻿using System;
-using UnityEngine;
+﻿using Assets.Engine.Render;
 
 namespace Assets
 {
     public interface IBaseUIComponent
     {
-        string Render();
+        void Render(Element container);
     }
 }

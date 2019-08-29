@@ -1,4 +1,5 @@
-﻿using MoonSharp.Interpreter;
+﻿using Assets.Engine.Render;
+using MoonSharp.Interpreter;
 
 namespace Assets.Engine.Components
 {
@@ -11,9 +12,11 @@ namespace Assets.Engine.Components
             this.state = state;
         }
 
-        public string Render()
+        public void Render(Element container)
         {
-            return state.Call(state.Globals["render"]).CastToString();
+            var elementId = state.Call(state.Globals["render"]).CastToString();
+
+            container.Children.Add(Element.GetById(elementId));
         }
     }
 }

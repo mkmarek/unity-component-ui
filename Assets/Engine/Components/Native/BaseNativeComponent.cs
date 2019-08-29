@@ -5,9 +5,13 @@ namespace Assets.Engine.Components.Native
 {
     public abstract class BaseNativeComponent : IBaseUIComponent
     {
-        public string Render()
+        public void Render(Element container)
         {
-            return null;
+            var builder = new ElementBuilder<GameObject>();
+
+            this.Render(builder);
+
+            container.Builder = builder;
         }
 
         public abstract void Render(ElementBuilder<GameObject> builder);

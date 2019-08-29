@@ -16,8 +16,7 @@ namespace Assets.Engine.Render
 
         public void BuildTree()
         {
-            var rootElementId = this.rootComponent.Create().Render();
-            rootElement = Element.GetById(rootElementId);
+            rootElement = Element.Create(this.rootComponent.Create());
 
             var stack = new Stack<Element>();
             stack.Push(rootElement);
@@ -27,22 +26,11 @@ namespace Assets.Engine.Render
             {
                 var element = stack.Pop();
 
-                if (element.Props?.ContainsKey("children") == false)
-                {
-                    continue;
-                }
+                element.Render();
 
-                if (!(element.Props?["children"] is Table children))
+                foreach (var child in element.Children)
                 {
-                    continue;
-                }
-
-                foreach (var child in children.Values)
-                {
-                    var childElement = Element.GetById(child.CastToString());
-
-                    element.Children.Add(childElement);
-                    stack.Push(childElement);
+                    stack.Push(child);
                 }
             }
         }
