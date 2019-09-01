@@ -40,7 +40,7 @@ namespace Assets.Editor.Language
         public int Start { get; set; }
         public string Value { get; set; }
 
-        public static string GetTokenKindDescription(TokenKind kind)
+        public static string GetTokenKindDescription(TokenKind kind, string value)
         {
             switch (kind)
             {
@@ -58,10 +58,10 @@ namespace Assets.Editor.Language
                 case TokenKind.BRACE_L: return "{";
                 case TokenKind.PIPE: return "|";
                 case TokenKind.BRACE_R: return "}";
-                case TokenKind.NAME: return "Name";
-                case TokenKind.INT: return "Int";
-                case TokenKind.FLOAT: return "Float";
-                case TokenKind.STRING: return "String";
+                case TokenKind.NAME: return value;
+                case TokenKind.INT: return value;
+                case TokenKind.FLOAT: return value;
+                case TokenKind.STRING: return $"\"{value}\"";
                 case TokenKind.LT: return "<";
                 case TokenKind.GT: return ">";
                 case TokenKind.FWD_SLASH: return "/";
@@ -72,9 +72,7 @@ namespace Assets.Editor.Language
 
         public override string ToString()
         {
-            return this.Value != null
-                ? $"{GetTokenKindDescription(this.Kind)} \"{this.Value}\""
-                : GetTokenKindDescription(this.Kind);
+            return GetTokenKindDescription(this.Kind, this.Value);
         }
     }
 }

@@ -10,8 +10,6 @@ namespace Assets.Engine.Render
         protected readonly Dictionary<string, LambdaExpression> setters;
         protected readonly Dictionary<string, object> valuesForSetters;
 
-        public Type Type => currentType;
-
         public ElementBuilder(Type currentType)
         {
             this.currentType = currentType;

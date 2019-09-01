@@ -13,9 +13,9 @@ namespace Assets.Engine.Render
 
         public IBaseUIComponent Component { get; }
 
-        public IDictionary<string, object> Props { get; private set; }
+        public PropCollection Props { get; }
 
-        private Element(IBaseUIComponent component, IDictionary<string, object> props = null)
+        private Element(IBaseUIComponent component, PropCollection props = null)
         {
             this.Component = component;
             this.Props = props;
@@ -27,26 +27,14 @@ namespace Assets.Engine.Render
 
             var element = new Element(
                 ComponentPool.Instance.GetComponentByName(name),
-                props);
+                new PropCollection(props));
 
             Elements.Add(id, element);
-
-            if (props?.ContainsKey("children") == false)
-            {
-                return id;
-            }
-
-            if (!(props?["children"] is Table children))
-            {
-                return id;
-            }
-
-            props["children"] = children.Values.Select(child => GetById(child.CastToString())).ToArray();
 
             return id;
         }
 
-        public static Element Create(IBaseUIComponent component, IDictionary<string, object> props = null)
+        public static Element Create(IBaseUIComponent component, PropCollection props = null)
         {
             return new Element(component, props);
         }

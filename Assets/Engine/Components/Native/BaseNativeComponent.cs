@@ -14,19 +14,6 @@ namespace Assets.Engine.Components.Native
             return builder;
         }
 
-        public abstract void Render(GameObjectElementBuilder builder, IDictionary<string, object> props);
-
-        protected void RenderChildren(GameObjectElementBuilder builder, IDictionary<string, object> props)
-        {
-            if (props?.ContainsKey("children") != true) return;
-
-            if (props["children"] is IEnumerable<Element> children)
-            {
-                foreach (var child in children)
-                {
-                    builder.AddChildBuilder(child.Render());
-                }
-            }
-        }
+        public abstract void Render(GameObjectElementBuilder builder, PropCollection props);
     }
 }

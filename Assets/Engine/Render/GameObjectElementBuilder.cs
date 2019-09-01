@@ -13,11 +13,6 @@ namespace Assets.Engine.Render
 
         public GameObject RootGameObject { get; private set; }
 
-        public ComponentElementBuilder GetComponentBuilder(int i)
-        {
-            return components[i];
-        }
-
         public GameObjectElementBuilder() : base(typeof(GameObject))
         {
             components = new List<ComponentElementBuilder>();
@@ -73,6 +68,16 @@ namespace Assets.Engine.Render
         public void AddChildBuilder(IRootElementBuilder builder)
         {
             childBuilders.Add(builder);
+        }
+
+        public void RenderElements(IEnumerable<Element> elements)
+        {
+            if (elements == null) return;
+
+            foreach (var element in elements)
+            {
+                AddChildBuilder(element.Render());
+            }
         }
     }
 }

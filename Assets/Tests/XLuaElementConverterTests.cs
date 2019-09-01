@@ -100,5 +100,35 @@ function render()
 end";
             Assert.AreEqual(expected, converter.Convert(original));
         }
+
+        [Test]
+        public void TemplateWithOneComponentSelfTerminatingWithProp()
+        {
+            var original = @"
+function render()
+	return <something value={100} />
+end";
+            var expected = @"
+function render()
+	return Create(""something"", { value = 100 })
+end";
+
+            Assert.AreEqual(expected, converter.Convert(original));
+        }
+
+        [Test]
+        public void TemplateWithOneComponentSelfTerminatingWithMultipleProps()
+        {
+            var original = @"
+function render()
+	return <something value={100} value2={200} />
+end";
+            var expected = @"
+function render()
+	return Create(""something"", { value = 100, value2 = 200 })
+end";
+
+            Assert.AreEqual(expected, converter.Convert(original));
+        }
     }
 }

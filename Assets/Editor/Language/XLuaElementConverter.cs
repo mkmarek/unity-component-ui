@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 
 namespace Assets.Editor.Language
@@ -12,6 +14,7 @@ namespace Assets.Editor.Language
             public Token End { get; set; }
             public string Name { get; set; }
             public List<Element> Children { get; set; }
+            public List<Tuple<string,string>> Props { get; set; }
 
             public string Replace(string source, ref int offset)
             {
@@ -34,10 +37,18 @@ namespace Assets.Editor.Language
             private string GetPropsMarkup()
             {
                 var childrenMarkup = GetChildrenMarkup();
+                var props = Props.Select(e => $"{e.Item1} = {e.Item2}").ToList();
 
-                return string.IsNullOrWhiteSpace(childrenMarkup)
+                if (!string.IsNullOrWhiteSpace(childrenMarkup))
+                {
+                    props.Add(childrenMarkup);
+                }
+
+                var propsInString = string.Join(", ", props);
+
+                return string.IsNullOrWhiteSpace(propsInString)
                     ? string.Empty
-                    : $", {{ {childrenMarkup} }}";
+                    : $", {{ {string.Join(", ", props)} }}";
             }
 
             private string GetChildrenMarkup()
@@ -88,6 +99,7 @@ namespace Assets.Editor.Language
         private Element TryParseElement(Token startingToken, ref Lexer lexer)
         {
             var children = new List<Element>();
+            var props = new List<Tuple<string, string>>();
 
             var nameToken = lexer.NextToken();
 
@@ -96,70 +108,104 @@ namespace Assets.Editor.Language
                 return null;
             }
 
-            var terminatorToken = lexer.NextToken();
-            var selfTerminating = true;
-
-            if (terminatorToken.Kind == TokenKind.GT)
+            while (true)
             {
-                selfTerminating = false;
+                var nextToken = lexer.NextToken();
 
-                TryParseChildren(ref lexer, children);
-            }
-            else if (terminatorToken.Kind != TokenKind.FWD_SLASH)
-            {
-                return null;
-            }
-
-            Token endToken;
-
-            if (!selfTerminating)
-            {
-                endToken = lexer.NextToken();
-
-                if (endToken.Kind != TokenKind.LT)
+                switch (nextToken.Kind)
                 {
-                    return null;
-                }
+                    case TokenKind.GT:
+                    {
+                        TryParseChildren(ref lexer, children);
 
-                endToken = lexer.NextToken();
+                        return new Element()
+                        {
+                            Start = startingToken,
+                            End = ParseTerminatingElement(lexer, nameToken.Value),
+                            Name = nameToken.Value,
+                            Children = children,
+                            Props = props
+                        };
+                    }
+                    case TokenKind.FWD_SLASH:
+                    {
+                        var endToken = lexer.NextToken();
 
-                if (endToken.Kind != TokenKind.FWD_SLASH)
-                {
-                    return null;
-                }
+                        if (endToken.Kind != TokenKind.GT)
+                        {
+                            return null;
+                        }
 
-                endToken = lexer.NextToken();
-
-                if (endToken.Kind != TokenKind.NAME || endToken.Value != nameToken.Value)
-                {
-                    return null;
-                }
-
-                endToken = lexer.NextToken();
-
-                if (endToken.Kind != TokenKind.GT)
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                endToken = lexer.NextToken();
-
-                if (endToken.Kind != TokenKind.GT)
-                {
-                    Debug.Log(endToken.Kind);
-                    return null;
+                        return new Element()
+                        {
+                            Start = startingToken,
+                            End = endToken,
+                            Name = nameToken.Value,
+                            Children = children,
+                            Props = props
+                        };
+                    }
+                    case TokenKind.NAME:
+                    {
+                        props.Add(ParseProp(nextToken.Value, lexer));
+                        break;
+                    }
+                    default:
+                        throw new CSLSyntaxErrorException($"Unexpected token {nextToken.Kind}", nextToken.Start);
                 }
             }
+        }
 
-            return new Element()
+        private Tuple<string, string> ParseProp(string propName, Lexer lexer)
+        {
+            var prop = new StringBuilder();
+            var braceNum = 1;
+
+            Check(lexer, TokenKind.EQUALS);
+            Check(lexer, TokenKind.BRACE_L);
+
+            var token = lexer.NextToken();
+            while (token.Kind != TokenKind.EOF && braceNum > 0)
             {
-                Start = startingToken,
-                End = endToken,
-                Name = nameToken.Value,
-                Children = children
-            };
+                if (token.Kind == TokenKind.BRACE_L) braceNum++;
+                if (token.Kind == TokenKind.BRACE_R) braceNum--;
+
+                if (braceNum == 0)
+                {
+                    return new Tuple<string, string>(propName, prop.ToString());
+                }
+
+                prop.Append(token);
+                token = lexer.NextToken();
+            }
+
+            return new Tuple<string, string>(propName, prop.ToString());
+        }
+
+        private Token ParseTerminatingElement(Lexer lexer, string elementName)
+        {
+            Check(lexer, TokenKind.LT);
+            Check(lexer, TokenKind.FWD_SLASH);
+            Check(lexer, TokenKind.NAME, elementName);
+
+            return Check(lexer, TokenKind.GT);
+        }
+
+        private Token Check(Lexer lexer, TokenKind kind, string value = null)
+        {
+            var token = lexer.NextToken();
+
+            if (token.Kind != kind)
+            {
+                throw new CSLSyntaxErrorException($"Expected {kind} got {token.Kind}", token.Start);
+            }
+
+            if (token.Value != value)
+            {
+                throw new CSLSyntaxErrorException($"Expected {kind} to have value {value}, got {token.Value}", token.Start);
+            }
+
+            return token;
         }
 
         private void TryParseChildren(ref Lexer lexer, List<Element> children)
