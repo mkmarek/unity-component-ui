@@ -18,7 +18,8 @@ namespace Assets.Engine
             components = new Dictionary<string, Func<IBaseUIComponent>>
             {
                 { "Panel", () => new PanelComponent() },
-                { "Button", () => new ButtonComponent() }
+                { "Button", () => new ButtonComponent() },
+                { "Text", () => new TextComponent() }
             };
         }
 

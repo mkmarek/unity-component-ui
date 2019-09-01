@@ -184,6 +184,7 @@ namespace Assets.Editor.Language
                 case '>': return this.CreatePunctuationToken(TokenKind.GT, 1);
                 case '/': return this.CreatePunctuationToken(TokenKind.FWD_SLASH, 1);
                 case ';': return this.CreatePunctuationToken(TokenKind.SEMICOLON, 1);
+                case '*': return this.CreatePunctuationToken(TokenKind.STAR, 1);
                 default: return null;
             }
         }

@@ -37,13 +37,15 @@ namespace Assets.Engine.Render
             return this;
         }
 
-        public GameObject Build(IRootElementBuilder previousBuilder)
+        public GameObject Build(IRootElementBuilder previousBuilder, Transform parent)
         {
             var previousGameObjectElementBuilder = previousBuilder as GameObjectElementBuilder;
 
             RootGameObject = previousGameObjectElementBuilder?.RootGameObject
                 ? previousGameObjectElementBuilder?.RootGameObject
                 : new GameObject();
+
+            RootGameObject.transform.SetParent(parent);
 
             for (var i = 0; i < components.Count; i++)
             {
@@ -57,9 +59,9 @@ namespace Assets.Engine.Render
 
             for (var i = 0; i < childBuilders.Count; i++)
             {
-                var childObjects = childBuilders[i].Build(previousGameObjectElementBuilder?.childBuilders[i]);
-
-                childObjects.transform.SetParent(RootGameObject.transform);
+                var childObjects = childBuilders[i].Build(
+                    previousGameObjectElementBuilder?.childBuilders[i],
+                    RootGameObject.transform);
             }
 
             return RootGameObject;

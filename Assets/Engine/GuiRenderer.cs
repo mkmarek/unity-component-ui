@@ -1,4 +1,6 @@
-﻿using Assets.Engine.Render;
+﻿using System.Collections.Generic;
+using Assets.Engine;
+using Assets.Engine.Render;
 using UnityEngine;
 
 namespace Assets
@@ -13,17 +15,28 @@ namespace Assets
 
         private void Start()
         {
-            rootElement = Element.Create(rootComponent.Create());
+            rootElement = Element.Create(rootComponent.Create(), new PropCollection(new Dictionary<string, object>()));
         }
 
         public void Traverse()
         {
             var previousBuilder = builder;
+
             builder = rootElement.Render();
 
-            var result = builder.Build(previousBuilder);
+            if (builder != null)
+            {
+                builder.Build(previousBuilder, this.transform);
+            }
+            else
+            {
+                builder = previousBuilder;
+            }
+        }
 
-            result.transform.SetParent(this.transform);
+        private void Update()
+        {
+            Traverse();
         }
     }
 }

@@ -1,6 +1,8 @@
 {
     "name": "UnityComponentUI.Engine",
-    "references": [],
+    "references": [
+        "Unity.Entities"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

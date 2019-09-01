@@ -1,20 +1,37 @@
 ﻿using System.Linq;
 using UnityEditor;
+using UnityEditor.Experimental.AssetImporters;
 
 namespace Assets.Editor
 {
     using UnityEngine;
 
-    [CustomEditor(typeof(UIComponentDefinition))]
-    public class LuaxFileInspector : UnityEditor.Editor
+    [CustomEditor(typeof(LuaxImporter))]
+    [CanEditMultipleObjects]
+    public class LuaxFileInspector : ScriptedImporterEditor
     {
+        SerializedProperty boundSystem;
+
+        public override void OnEnable()
+        {
+            base.OnEnable();
+            // Once in OnEnable, retrieve the serializedObject property and store it.
+            boundSystem = serializedObject.FindProperty("boundSystem");
+        }
+
         public override void OnInspectorGUI()
         {
-            var component = (UIComponentDefinition)this.target;
+            // Update the serializedObject in case it has been changed outside the Inspector.
+            serializedObject.Update();
 
-            GUILayout.Label("Component name: " + component.ComponentName);
-            GUILayout.Label("Markup:");
-            GUILayout.Box(component.Markup);
+            // Draw the boolean property.
+            EditorGUILayout.PropertyField(boundSystem);
+
+            // Apply the changes so Undo/Redo is working
+            serializedObject.ApplyModifiedProperties();
+
+            // Call ApplyRevertGUI to show Apply and Revert buttons.
+            ApplyRevertGUI();
         }
     }
 }

@@ -11,12 +11,12 @@ namespace Assets.Engine.Render
             childBuilder = builder;
         }
 
-        public GameObject Build(IRootElementBuilder previousBuilder)
+        public GameObject Build(IRootElementBuilder previousBuilder, Transform parent)
         {
             var previousPassThroughBuilder = (previousBuilder as PassThroughElementBuilder);
             var previousChildBuilder = previousPassThroughBuilder?.childBuilder;
 
-            return childBuilder.Build(previousChildBuilder);
+            return childBuilder.Build(previousChildBuilder, parent);
         }
     }
 }

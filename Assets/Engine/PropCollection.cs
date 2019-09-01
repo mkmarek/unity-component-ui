@@ -10,7 +10,6 @@ namespace Assets.Engine
     {
         public PropCollection(IDictionary<string, object> props) : base(props ?? new Dictionary<string, object>())
         {
-
         }
 
         public IEnumerable<Element> GetElements(string key)
@@ -35,6 +34,24 @@ namespace Assets.Engine
             var value = this[key];
 
             return Convert.ToInt32(value);
+        }
+
+        public string GetString(string key, string defaultValue)
+        {
+            if (!ContainsKey(key)) return defaultValue;
+
+            var value = this[key];
+
+            return Convert.ToString(value);
+        }
+
+        public Action GetCallbackAction(string key)
+        {
+            if (!ContainsKey(key)) return null;
+
+            var value = this[key] as CallbackFunction;
+
+            return () => value.ClrCallback(null, new CallbackArguments(new List<DynValue>(), false));
         }
     }
 }

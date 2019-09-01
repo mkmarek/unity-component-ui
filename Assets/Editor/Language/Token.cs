@@ -30,7 +30,8 @@ namespace Assets.Editor.Language
         GT = 20,
         FWD_SLASH = 21,
         SEMICOLON = 22,
-        DOT = 23
+        DOT = 23,
+        STAR = 24
     }
 
     public class Token
@@ -65,9 +66,12 @@ namespace Assets.Editor.Language
                 case TokenKind.LT: return "<";
                 case TokenKind.GT: return ">";
                 case TokenKind.FWD_SLASH: return "/";
+                case TokenKind.STAR: return "*";
+                case TokenKind.SEMICOLON: return ";";
+                case TokenKind.DOT: return ".";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(kind), kind, null);
             }
-
-            return string.Empty;
         }
 
         public override string ToString()

@@ -3,11 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using MoonSharp.Interpreter;
 
 namespace Assets.Engine.Utils
 {
     public static class ReflectionUtils
     {
+        static ReflectionUtils()
+        {
+            Script.GlobalOptions.CustomConverters.SetScriptToClrCustomConversion(DataType.ClrFunction, typeof(Action),
+                v => new Action(() => v.Callback.Invoke(null, null)));
+        }
+
         public static string GetPropertyChain<TSource, TProperty>(Expression<Func<TSource, TProperty>> expression)
         {
             if (!(expression.Body is MemberExpression member))
