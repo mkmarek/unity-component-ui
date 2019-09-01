@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MoonSharp.Interpreter;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Assets.Engine.Render
 {
@@ -13,13 +15,8 @@ namespace Assets.Engine.Render
 
         public IDictionary<string, object> Props { get; private set; }
 
-        public IList<Element> Children { get; }
-
-        public ElementBuilder<GameObject> Builder { get; set; }
-
         private Element(IBaseUIComponent component, IDictionary<string, object> props = null)
         {
-            this.Children = new List<Element>();
             this.Component = component;
             this.Props = props;
         }
@@ -44,12 +41,7 @@ namespace Assets.Engine.Render
                 return id;
             }
 
-            foreach (var child in children.Values)
-            {
-                var childElement = GetById(child.CastToString());
-
-                element.Children.Add(childElement);
-            }
+            props["children"] = children.Values.Select(child => GetById(child.CastToString())).ToArray();
 
             return id;
         }
@@ -64,9 +56,11 @@ namespace Assets.Engine.Render
             return Elements.ContainsKey(id) ? Elements[id] : null;
         }
 
-        public void Render()
+        public IRootElementBuilder Render()
         {
-            this.Component.Render(this);
+            var builder = this.Component.Render(this);
+
+            return builder;
         }
     }
 }

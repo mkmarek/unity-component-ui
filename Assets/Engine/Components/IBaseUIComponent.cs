@@ -4,6 +4,6 @@ namespace Assets
 {
     public interface IBaseUIComponent
     {
-        void Render(Element container);
+        IRootElementBuilder Render(Element container);
     }
 }

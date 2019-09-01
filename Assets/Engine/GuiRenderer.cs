@@ -1,6 +1,4 @@
-﻿using System;
-using System.Reflection;
-using Assets.Engine.Render;
+﻿using Assets.Engine.Render;
 using UnityEngine;
 
 namespace Assets
@@ -10,13 +8,22 @@ namespace Assets
         [SerializeField]
         private UIComponentDefinition rootComponent;
 
-        private Reconciler reconciler;
+        private Element rootElement;
+        private IRootElementBuilder builder;
 
         private void Start()
         {
-            reconciler = new Reconciler(rootComponent);
+            rootElement = Element.Create(rootComponent.Create());
+        }
 
-            reconciler.BuildTree();
+        public void Traverse()
+        {
+            var previousBuilder = builder;
+            builder = rootElement.Render();
+
+            var result = builder.Build(previousBuilder);
+
+            result.transform.SetParent(this.transform);
         }
     }
 }

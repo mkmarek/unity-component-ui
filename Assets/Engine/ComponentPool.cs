@@ -9,36 +9,22 @@ namespace Assets.Engine
     {
         private static ComponentPool instance;
 
-        public static ComponentPool Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new ComponentPool();
-                }
+        public static ComponentPool Instance => instance ?? (instance = new ComponentPool());
 
-                return instance;
-            }
-        }
-
-        private Dictionary<string, Func<IBaseUIComponent>> components;
+        private readonly Dictionary<string, Func<IBaseUIComponent>> components;
 
         public ComponentPool()
         {
-            components = new Dictionary<string, Func<IBaseUIComponent>>();
-            components.Add("Panel", () => new PanelComponent());
-            components.Add("Button", () => new ButtonComponent());
+            components = new Dictionary<string, Func<IBaseUIComponent>>
+            {
+                { "Panel", () => new PanelComponent() },
+                { "Button", () => new ButtonComponent() }
+            };
         }
 
         public IBaseUIComponent GetComponentByName(string name)
         {
-            if (components.ContainsKey(name))
-            {
-                return components[name]();
-            }
-
-            return null;
+            return components.ContainsKey(name) ? components[name]() : null;
         }
     }
 }

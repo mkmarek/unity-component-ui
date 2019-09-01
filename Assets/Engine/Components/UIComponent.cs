@@ -12,11 +12,12 @@ namespace Assets.Engine.Components
             this.state = state;
         }
 
-        public void Render(Element container)
+        public IRootElementBuilder Render(Element container)
         {
             var elementId = state.Call(state.Globals["render"]).CastToString();
+            var element = Element.GetById(elementId);
 
-            container.Children.Add(Element.GetById(elementId));
+            return new PassThroughElementBuilder(element.Render());
         }
     }
 }
