@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using Assets.Engine.Components;
 using Assets.Engine.Components.Native;
+using UnityEditor;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Assets.Engine
 {
@@ -21,11 +24,33 @@ namespace Assets.Engine
                 { "Button", () => new ButtonComponent() },
                 { "Text", () => new TextComponent() }
             };
+
+            var foundObjects = GetAllInstances<UIComponentDefinition>();
+
+            foreach (var obj in foundObjects)
+            {
+                components.Add(obj.ComponentName, () => obj.Create());
+            }
         }
 
         public IBaseUIComponent GetComponentByName(string name)
         {
             return components.ContainsKey(name) ? components[name]() : null;
+        }
+
+        public static T[] GetAllInstances<T>() where T : ScriptableObject
+        {
+            var guids = AssetDatabase.FindAssets("t:" + typeof(T).Name);
+            var a = new T[guids.Length];
+
+            for (int i = 0; i < guids.Length; i++)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guids[i]);
+                a[i] = AssetDatabase.LoadAssetAtPath<T>(path);
+            }
+
+            return a;
+
         }
     }
 }

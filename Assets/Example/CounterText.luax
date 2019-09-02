@@ -1,0 +1,5 @@
+function render(props)
+	return (
+		<Text x={50} y={80} width={200} height={50} text={props.count}/>
+	)
+end
