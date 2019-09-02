@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using Assets.Engine;
 using Assets.Engine.Render;
 using UnityEngine;
@@ -12,31 +13,45 @@ namespace Assets
 
         private Element rootElement;
         private IRootElementBuilder builder;
+        private IRootElementBuilder previousBuilder;
+        private bool changed;
+
+        private static object _locker = new object();
 
         private void Start()
         {
+            var i = ComponentPool.Instance;
             rootElement = Element.Create(rootComponent.Create(), new PropCollection(new Dictionary<string, object>()));
-        }
 
-        public void Traverse()
-        {
-            var previousBuilder = builder;
-
-            builder = rootElement.Render();
-
-            if (builder != null)
+            var t = new Thread(() =>
             {
-                builder.Build(previousBuilder, this.transform);
-            }
-            else
-            {
-                builder = previousBuilder;
-            }
+                while (true)
+                {
+                    if (changed) continue;
+
+                    var newBuilder = rootElement.Render();
+
+                    if (newBuilder == null) continue;
+
+                    lock (_locker)
+                    {
+                        previousBuilder = builder;
+                        builder = newBuilder;
+                        changed = true;
+                    }
+                }
+            });
+
+            t.Start();
         }
 
         private void Update()
         {
-            Traverse();
+            if (!changed) return;
+
+            builder.Build(previousBuilder, this.transform);
+
+            changed = false;
         }
     }
 }

@@ -22,7 +22,11 @@ namespace Assets.Engine.Render
 
             foreach (var key in setters.Keys)
             {
-                ReflectionUtils.SetProperty(component, setters[key], valuesForSetters[key]);
+                var value = valuesForSetters.ContainsKey(key)
+                    ? valuesForSetters[key]
+                    : valueFactoriesForSetters[key].DynamicInvoke();
+
+                ReflectionUtils.SetProperty(component, setters[key], value);
             }
 
             return component;
@@ -37,6 +41,17 @@ namespace Assets.Engine.Render
             var key = ReflectionUtils.GetPropertyChain(property);
             setters.Add(key, property);
             valuesForSetters.Add(key, value);
+
+            return this;
+        }
+
+        public ComponentElementBuilder<TElement> SetPropertyDelayed<TValue>(
+            Expression<Func<TElement, TValue>> property, Func<TValue> value)
+        {
+            var key = ReflectionUtils.GetPropertyChain(property);
+
+            setters.Add(key, property);
+            valueFactoriesForSetters.Add(key, value);
 
             return this;
         }
