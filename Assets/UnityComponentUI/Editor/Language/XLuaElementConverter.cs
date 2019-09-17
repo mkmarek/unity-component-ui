@@ -144,7 +144,7 @@ namespace UnityComponentUI.Editor.Language
                 }
 
                 prop.Append(token);
-                token = lexer.NextToken();
+                token = lexer.NextToken(true);
             }
 
             return new Tuple<string, string>(propName, prop.ToString());

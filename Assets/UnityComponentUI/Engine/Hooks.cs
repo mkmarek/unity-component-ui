@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityComponentUI.Engine.Components;
 using UnityEngine;
 
@@ -25,8 +24,6 @@ namespace UnityComponentUI.Engine
 
     public class Hooks
     {
-        private static readonly List<IDictionary<string, object>> RegisteredStates = new List<IDictionary<string, object>>();
-
         private static readonly IDictionary<HookType, Hook> PrepopulatedHookData =
             new Dictionary<HookType, Hook>();
 

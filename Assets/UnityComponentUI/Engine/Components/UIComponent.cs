@@ -2,6 +2,7 @@
 using System.Linq;
 using UnityComponentUI.Engine.Render;
 using MoonSharp.Interpreter;
+using UnityEngine;
 
 namespace UnityComponentUI.Engine.Components
 {

@@ -19,10 +19,17 @@ namespace UnityComponentUI.Editor.Language
             this.source = lexer.source;
         }
 
-        public Token NextToken()
+        public Token NextToken(bool includeWhitespace = false)
         {
             if (this.source == null)
                 return this.CreateEOFToken();
+
+            if (includeWhitespace)
+            {
+                var whitespaceToken = CheckForWhiteSpace(this.source[this.currentIndex]);
+                if (whitespaceToken != null)
+                    return whitespaceToken;
+            }
 
             this.currentIndex = this.GetPositionAfterWhitespace(this.source, this.currentIndex);
 
@@ -156,6 +163,32 @@ namespace UnityComponentUI.Editor.Language
                 throw new CSLSyntaxErrorException(
                     $"Invalid character within String: \\u{((int)code).ToString("D4")}.", this.currentIndex);
             }
+        }
+
+        private Token CheckForWhiteSpace(char code)
+        {
+            switch (code)
+            {
+                case '\xFEFF': // BOM
+                case '\t': // tab
+                case ' ': // space
+                case '\n': // new line
+                case '\r': // carriage return
+                case ',': // Comma
+                    var token = new Token()
+                    {
+                        Start = this.currentIndex,
+                        End = this.currentIndex + 1,
+                        Kind = TokenKind.WHITESPACE,
+                        Value = code.ToString()
+                    };
+
+                    this.currentIndex += 1;
+
+                    return token;
+            }
+
+            return null;
         }
 
         private Token CheckForPunctuationTokens(char code)

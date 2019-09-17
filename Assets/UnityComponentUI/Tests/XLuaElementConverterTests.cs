@@ -154,7 +154,7 @@ function render()
 end";
             var expected = @"
 function render()
-	return Create(""something"", { prop = screenSize.width/2-150 })
+	return Create(""something"", { prop = screenSize.width / 2 - 150 })
 end";
 
             Assert.AreEqual(expected, converter.Convert(original));

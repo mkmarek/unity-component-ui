@@ -1,6 +1,6 @@
 function render(props)
 	screenSize = UseScreenSize()
-	counterState = UseState(44)
+	counterState = UseState(0)
 
 	function increment()
 		counterState.change(counterState.value + 1)
@@ -26,8 +26,8 @@ function render(props)
 			<Button image={"gui"} x={150} y={10} width={50} height={50} onClick={decrement}>
 				<Text textAnchor={"MiddleCenter"} alignByGeometry={"true"} x={0} y={0} width={50} height={50} text={"Minus"}/>
 			</Button>
-			<CounterText y={80} count={counterState.value} />
-			<CounterText y={100} count={props.count} />
+			<CounterText y={80} count={"From local state: " .. (counterState.value or "")} />
+			<CounterText y={100} count={"From system: " .. props.count} />
 		</Panel>
 	)
 end

@@ -29,7 +29,8 @@ namespace UnityComponentUI.Editor.Language
         DOT = 23,
         STAR = 24,
         MINUS = 25,
-        PLUS = 26
+        PLUS = 26,
+        WHITESPACE = 27,
     }
 
     public class Token
@@ -69,6 +70,7 @@ namespace UnityComponentUI.Editor.Language
                 case TokenKind.DOT: return ".";
                 case TokenKind.MINUS: return "-";
                 case TokenKind.PLUS: return "+";
+                case TokenKind.WHITESPACE: return value;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(kind), kind, null);
             }
