@@ -32,6 +32,11 @@ namespace UnityComponentUI.Example
         private readonly Invokable onPlusClicked = new Invokable();
         private readonly Invokable onMinusClicked = new Invokable();
 
+        protected override PropCollection DefaultProps => new PropCollection(new Dictionary<string, object>
+        {
+            { "count", 0 }
+        });
+
         protected override IDictionary<string, object> GetProps(ref JobHandle inputDeps)
         {
             var counters = new NativeQueue<CounterComponent>(Allocator.TempJob);

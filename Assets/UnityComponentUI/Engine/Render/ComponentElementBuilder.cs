@@ -26,7 +26,12 @@ namespace UnityComponentUI.Engine.Render
                     ? valuesForSetters[key]
                     : valueFactoriesForSetters[key].DynamicInvoke();
 
-                ReflectionUtils.SetProperty(component, setters[key], value);
+                var existing = ReflectionUtils.GetProperty(component, setters[key]);
+
+                if (existing == null || !existing.Equals(value))
+                {
+                    ReflectionUtils.SetProperty(component, setters[key], value);
+                }
             }
 
             return component;

@@ -42,7 +42,7 @@ namespace UnityComponentUI.Editor.Language
             if (char.IsLetter(code) || code == '_')
                 return this.ReadName();
 
-            if (char.IsNumber(code) || code == '-')
+            if (char.IsNumber(code))
                 return this.ReadNumber();
 
             if (code == '"')
@@ -180,6 +180,8 @@ namespace UnityComponentUI.Editor.Language
                 case '/': return this.CreatePunctuationToken(TokenKind.FWD_SLASH, 1);
                 case ';': return this.CreatePunctuationToken(TokenKind.SEMICOLON, 1);
                 case '*': return this.CreatePunctuationToken(TokenKind.STAR, 1);
+                case '-': return this.CreatePunctuationToken(TokenKind.MINUS, 1);
+                case '+': return this.CreatePunctuationToken(TokenKind.PLUS, 1);
                 default: return null;
             }
         }

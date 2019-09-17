@@ -129,5 +129,35 @@ end";
 
             Assert.AreEqual(expected, converter.Convert(original));
         }
+
+        [Test]
+        public void TemplateWithCodeInside()
+        {
+            var original = @"
+function render()
+	return <something>{foo()}</something>
+end";
+            var expected = @"
+function render()
+	return Create(""something"", { children = { foo() } })
+end";
+
+            Assert.AreEqual(expected, converter.Convert(original));
+        }
+
+        [Test]
+        public void TemplateWithPropWithExpression()
+        {
+            var original = @"
+function render()
+	return <something prop={screenSize.width / 2 - 150} />
+end";
+            var expected = @"
+function render()
+	return Create(""something"", { prop = screenSize.width/2-150 })
+end";
+
+            Assert.AreEqual(expected, converter.Convert(original));
+        }
     }
 }

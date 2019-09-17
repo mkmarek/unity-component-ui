@@ -1,9 +1,33 @@
 function render(props)
+	screenSize = UseScreenSize()
+	counterState = UseState(44)
+
+	function increment()
+		counterState.change(counterState.value + 1)
+		props.onPlusClicked()
+	end
+
+	function decrement()
+		counterState.change(counterState.value - 1)
+		props.onMinusClicked()
+	end
+
 	return (
-		<Panel x={0} y={0} width={300} height={300}>
-			<Button x={90} y={10} width={50} height={50} onClick={props.onPlusClicked}/>
-			<Button x={150} y={10} width={50} height={50} onClick={props.onMinusClicked}/>
-			<CounterText count={props.count} />
+		<Panel
+			x={screenSize.width / 2 - 150}
+			y={screenSize.height / 2 - 150}
+			image={"gui"}
+			width={300}
+			height={300}>
+
+			<Button image={"gui"} x={90} y={10} width={50} height={50} onClick={increment}>
+				<Text textAnchor={"MiddleCenter"} alignByGeometry={"true"} x={0} y={0} width={50} height={50} text={"Plus"}/>
+			</Button>
+			<Button image={"gui"} x={150} y={10} width={50} height={50} onClick={decrement}>
+				<Text textAnchor={"MiddleCenter"} alignByGeometry={"true"} x={0} y={0} width={50} height={50} text={"Minus"}/>
+			</Button>
+			<CounterText y={80} count={counterState.value} />
+			<CounterText y={100} count={props.count} />
 		</Panel>
 	)
 end

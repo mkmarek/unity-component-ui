@@ -27,7 +27,9 @@ namespace UnityComponentUI.Editor.Language
         FWD_SLASH = 21,
         SEMICOLON = 22,
         DOT = 23,
-        STAR = 24
+        STAR = 24,
+        MINUS = 25,
+        PLUS = 26
     }
 
     public class Token
@@ -65,6 +67,8 @@ namespace UnityComponentUI.Editor.Language
                 case TokenKind.STAR: return "*";
                 case TokenKind.SEMICOLON: return ";";
                 case TokenKind.DOT: return ".";
+                case TokenKind.MINUS: return "-";
+                case TokenKind.PLUS: return "+";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(kind), kind, null);
             }

@@ -7,6 +7,8 @@ namespace UnityComponentUI.Engine.Components.Native
 {
     public class ButtonComponent : BaseLayoutComponent
     {
+        public override string Name => nameof(ButtonComponent);
+
         public override void Render(GameObjectElementBuilder builder, PropCollection props)
         {
             base.Render(builder, props);
@@ -15,11 +17,24 @@ namespace UnityComponentUI.Engine.Components.Native
             var button = builder.AddComponent<Button>();
             var onClick = props.GetCallbackAction("onClick");
 
-            var buttonClickedEvent = new Button.ButtonClickedEvent();
-            buttonClickedEvent.AddListener(new UnityAction(onClick));
+            if (onClick != null)
+            {
+                var buttonClickedEvent = new Button.ButtonClickedEvent();
+                buttonClickedEvent.AddListener(new UnityAction(onClick));
 
-            button.SetProperty(e => e.onClick, buttonClickedEvent);
-            image.SetProperty(e => e.color, Color.blue);
+                button.SetProperty(e => e.onClick, buttonClickedEvent);
+            }
+
+            var imageResource = props.GetString("image", null);
+
+            if (imageResource != null)
+            {
+                image.SetProperty(e => e.sprite, ComponentResources.Get(imageResource));
+            }
+
+            image.SetProperty(e => e.type, Image.Type.Sliced);
+
+            builder.RenderElements(props.GetElements("children"));
         }
     }
 }

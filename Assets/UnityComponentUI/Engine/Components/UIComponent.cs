@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityComponentUI.Engine.Render;
 using MoonSharp.Interpreter;
 
@@ -9,31 +10,58 @@ namespace UnityComponentUI.Engine.Components
         private Script state;
         private ConnectedSystem system;
         private PropCollection previousProps;
+        private IEnumerable<Hook> previousHooks;
+        private List<Hook> currentHooks;
+        private int currentHookIndex;
 
-        public UIComponent(Script state, ConnectedSystem system)
+        public string Name { get; }
+
+        public UIComponent(string componentName, Script state, ConnectedSystem system)
         {
             this.state = state;
             this.system = system;
+            this.Name = componentName;
+            currentHooks = new List<Hook>();
         }
 
         public IRootElementBuilder Render(Element container)
         {
+            var haveChanged = false;
             var props = MergeProps(container.Props, system?.Props);
 
-            if (previousProps != null)
+            if (previousProps == null || HavePropsChanged(previousProps, props))
             {
-                if (!HavePropsChanged(previousProps, props))
-                {
-                    return null;
-                }
+                haveChanged = true;
             }
 
+            if (currentHooks.Any(e => e.Invalidated))
+            {
+                haveChanged = true;
+            }
+
+            if (!haveChanged) return null;
+
+            Hooks.CurrentComponent = this;
+            currentHookIndex = 0;
+
             var elementId = state.Call(state.Globals["render"], props).CastToString();
+            Hooks.CurrentComponent = null;
             var element = Element.GetById(elementId);
 
             previousProps = props;
 
             return new PassThroughElementBuilder(element.Render());
+        }
+
+        public Hook GetOrRgisterHook(Hook hook)
+        {
+            if (currentHooks.Count <= currentHookIndex)
+            {
+                currentHooks.Add(hook);
+                return hook;
+            }
+
+            return currentHooks[currentHookIndex++];
         }
 
         private bool HavePropsChanged(PropCollection previous, PropCollection current)

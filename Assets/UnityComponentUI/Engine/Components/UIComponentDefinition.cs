@@ -41,9 +41,12 @@ namespace UnityComponentUI.Engine.Components
             var state = new Script();
 
             state.Globals["Create"] = (Func<string, IDictionary<string, object>, string>)Element.Create;
+            state.Globals["UseScreenSize"] = (Func<object>)Hooks.UseScreenSize;
+            state.Globals["UseState"] = (Func<object, IDictionary<string, object>>)Hooks.UseState;
+
             state.DoString(markup);
 
-            return new UIComponent(state, ConnectedSystemRegistry.Instance.Get(boundSystem));
+            return new UIComponent(componentName, state, ConnectedSystemRegistry.Instance.Get(boundSystem));
         }
     }
 }

@@ -10,13 +10,15 @@ namespace UnityComponentUI.Engine.Render
     {
         protected readonly List<ComponentElementBuilder> components;
         private List<IRootElementBuilder> childBuilders;
+        private string name;
 
         public GameObject RootGameObject { get; private set; }
 
-        public GameObjectElementBuilder() : base(typeof(GameObject))
+        public GameObjectElementBuilder(string name) : base(typeof(GameObject))
         {
             components = new List<ComponentElementBuilder>();
             childBuilders = new List<IRootElementBuilder>();
+            this.name = name;
         }
 
         public ComponentElementBuilder<TComponent> AddComponent<TComponent>()
@@ -37,15 +39,15 @@ namespace UnityComponentUI.Engine.Render
             return this;
         }
 
-        public GameObject Build(IRootElementBuilder previousBuilder, Transform parent)
+        public GameObject Build(IRootElementBuilder previousBuilder, IObjectPool pool, Transform parent = null)
         {
             var previousGameObjectElementBuilder = previousBuilder as GameObjectElementBuilder;
 
-            RootGameObject = previousGameObjectElementBuilder?.RootGameObject
+            RootGameObject = previousGameObjectElementBuilder?.RootGameObject != null
                 ? previousGameObjectElementBuilder?.RootGameObject
-                : new GameObject();
+                : new GameObject(name);
 
-            RootGameObject.transform.SetParent(parent);
+            RootGameObject.transform.SetParent(parent ? parent : pool.Root);
 
             for (var i = 0; i < components.Count; i++)
             {
@@ -59,12 +61,30 @@ namespace UnityComponentUI.Engine.Render
 
             for (var i = 0; i < childBuilders.Count; i++)
             {
+                var previousChildBuilder = previousGameObjectElementBuilder?.childBuilders.Count <= i
+                    ? null
+                    : previousGameObjectElementBuilder?.childBuilders[i];
+
                 var childObjects = childBuilders[i].Build(
-                    previousGameObjectElementBuilder?.childBuilders[i],
+                    previousChildBuilder,
+                    pool,
                     RootGameObject.transform);
             }
 
+            if (childBuilders.Count < previousGameObjectElementBuilder?.childBuilders.Count)
+            {
+                for (var i = childBuilders.Count; i < previousGameObjectElementBuilder.childBuilders.Count; i++)
+                {
+                    previousGameObjectElementBuilder.childBuilders[i].Destroy(pool);
+                }
+            }
+
             return RootGameObject;
+        }
+
+        public void Destroy(IObjectPool pool)
+        {
+            pool.MarkForDestruction(RootGameObject);
         }
 
         public void AddChildBuilder(IRootElementBuilder builder)

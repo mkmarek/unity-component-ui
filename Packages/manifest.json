@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.unity.2d.sprite": "1.0.0",
     "com.unity.entities": "0.0.12-preview.32",
     "com.unity.ext.nunit": "1.0.0",
     "com.unity.package-manager-ui": "2.2.0",

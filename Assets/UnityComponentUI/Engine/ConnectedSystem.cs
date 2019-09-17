@@ -7,7 +7,10 @@ namespace UnityComponentUI.Engine
 {
     public abstract class ConnectedSystem : JobComponentSystem
     {
-        public PropCollection Props { get; private set; }
+        public PropCollection Props => props ?? DefaultProps;
+
+        private PropCollection props;
+        protected virtual PropCollection DefaultProps => null;
 
         protected override void OnCreate()
         {
@@ -21,7 +24,7 @@ namespace UnityComponentUI.Engine
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            Props = new PropCollection(GetProps(ref inputDeps));
+            props = new PropCollection(GetProps(ref inputDeps));
 
             return inputDeps;
         }

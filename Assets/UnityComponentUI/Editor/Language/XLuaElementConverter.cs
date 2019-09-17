@@ -2,73 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Assets.UnityComponentUI.Editor.Language;
 
 namespace UnityComponentUI.Editor.Language
 {
     public class XLuaElementConverter
     {
-        private class Element
-        {
-            public Token Start { get; set; }
-            public Token End { get; set; }
-            public string Name { get; set; }
-            public List<Element> Children { get; set; }
-            public List<Tuple<string,string>> Props { get; set; }
-
-            public string Replace(string source, ref int offset)
-            {
-                var componentString = GetComponentMarkup();
-                var result = source
-                    .Remove(Start.Start + offset, End.End - Start.Start)
-                    .Insert(Start.Start + offset, componentString);
-
-                // adjust the offset because of changed string size
-                offset = offset + componentString.Length - (End.End - Start.Start);
-
-                return result;
-            }
-
-            private string GetComponentMarkup()
-            {
-                return $"Create(\"{Name}\"{GetPropsMarkup()})";
-            }
-
-            private string GetPropsMarkup()
-            {
-                var childrenMarkup = GetChildrenMarkup();
-                var props = Props.Select(e => $"{e.Item1} = {e.Item2}").ToList();
-
-                if (!string.IsNullOrWhiteSpace(childrenMarkup))
-                {
-                    props.Add(childrenMarkup);
-                }
-
-                var propsInString = string.Join(", ", props);
-
-                return string.IsNullOrWhiteSpace(propsInString)
-                    ? string.Empty
-                    : $", {{ {string.Join(", ", props)} }}";
-            }
-
-            private string GetChildrenMarkup()
-            {
-                if (Children.Count == 0)
-                {
-                    return null;
-                }
-
-                var childrenComponents = string.Join(", ", Children
-                    .Select(e => e.GetComponentMarkup())
-                    .ToArray());
-
-                return $"children = {{ {childrenComponents} }}";
-            }
-        }
-
         public string Convert(string source)
         {
             var lexer = new Lexer(source, 0);
-            var elements = new List<Element>();
+            var elements = new List<LuaXElement>();
             var offset = 0;
 
             Token nextToken = null;
@@ -95,10 +38,36 @@ namespace UnityComponentUI.Editor.Language
             return source;
         }
 
-        private Element TryParseElement(Token startingToken, ref Lexer lexer)
+        private LuaXElement TryParseElement(Token startingToken, ref Lexer lexer)
         {
-            var children = new List<Element>();
+            var children = new List<LuaXElement>();
             var props = new List<Tuple<string, string>>();
+
+
+            if (startingToken.Kind == TokenKind.BRACE_L)
+            {
+                var nested = 1;
+                var sb = new StringBuilder();
+                Token token = null;
+
+                do
+                {
+                    token = lexer.NextToken();
+
+                    if (token.Kind == TokenKind.BRACE_L) nested++;
+                    else if (token.Kind == TokenKind.BRACE_R) nested--;
+                    else sb.Append(token.ToString());
+
+                } while (nested > 0);
+
+                return new LuaXCodeElement()
+                {
+                    Start = startingToken,
+                    End = token,
+                    Name = token.Value,
+                    Code = sb.ToString()
+                }; ;
+            }
 
             var nameToken = lexer.NextToken();
 
@@ -117,7 +86,7 @@ namespace UnityComponentUI.Editor.Language
                     {
                         TryParseChildren(ref lexer, children);
 
-                        return new Element()
+                        return new LuaXComponentElement()
                         {
                             Start = startingToken,
                             End = ParseTerminatingElement(lexer, nameToken.Value),
@@ -135,7 +104,7 @@ namespace UnityComponentUI.Editor.Language
                             return null;
                         }
 
-                        return new Element()
+                        return new LuaXComponentElement()
                         {
                             Start = startingToken,
                             End = endToken,
@@ -207,9 +176,9 @@ namespace UnityComponentUI.Editor.Language
             return token;
         }
 
-        private void TryParseChildren(ref Lexer lexer, List<Element> children)
+        private void TryParseChildren(ref Lexer lexer, List<LuaXElement> children)
         {
-            Element nested;
+            LuaXElement nested;
 
             do
             {

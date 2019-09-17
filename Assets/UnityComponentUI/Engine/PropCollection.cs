@@ -8,23 +8,47 @@ namespace UnityComponentUI.Engine
 {
     public class PropCollection : Dictionary<string, object>
     {
+        private static List<Action> pendingCallbacks = new List<Action>();
+
         public PropCollection(IDictionary<string, object> props) : base(props ?? new Dictionary<string, object>())
         {
+        }
+
+        public static void FlushCallbacks()
+        {
+            var copy = pendingCallbacks.ToList();
+            foreach (var callback in copy)
+            {
+                callback?.Invoke();
+            }
+
+            pendingCallbacks.Clear();
         }
 
         public IEnumerable<Element> GetElements(string key)
         {
             if (!ContainsKey(key))
             {
-                return null;
+                yield break;
             }
 
             if (!(this[key] is Table table))
             {
-                return null;
+                yield break;
             }
 
-            return table.Values.Select(child => Element.GetById(child.CastToString())).ToArray();
+            foreach (var child in table.Values)
+            {
+                if (child.Table != null)
+                {
+                    foreach (var nested in child.Table.Values)
+                    {
+                        yield return Element.GetById(nested.CastToString());
+                    }
+                }
+
+                else yield return Element.GetById(child.CastToString());
+            }
         }
 
         public int GetInt(string key, int defaultValue)
@@ -49,9 +73,29 @@ namespace UnityComponentUI.Engine
         {
             if (!ContainsKey(key)) return null;
 
-            var value = this[key] as CallbackFunction;
+            if (this[key] is CallbackFunction cb)
+            {
+                return () => pendingCallbacks.Add(() =>
+                    cb.ClrCallback(null, new CallbackArguments(new List<DynValue>(), false)));
+            }
 
-            return () => value.ClrCallback(null, new CallbackArguments(new List<DynValue>(), false));
+            if (this[key] is Closure cl)
+            {
+                return () => pendingCallbacks.Add(() => cl.Call());
+            }
+
+            return null;
+        }
+
+        public T GetEnum<T>(string key, T defaultValue)
+        {
+            if (!ContainsKey(key)) return defaultValue;
+
+            var value = this[key];
+
+            var strValue = Convert.ToString(value);
+
+            return (T)Enum.Parse(typeof(T), strValue);
         }
     }
 }

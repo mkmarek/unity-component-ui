@@ -11,12 +11,17 @@ namespace UnityComponentUI.Engine.Render
             childBuilder = builder;
         }
 
-        public GameObject Build(IRootElementBuilder previousBuilder, Transform parent)
+        public GameObject Build(IRootElementBuilder previousBuilder, IObjectPool pool, Transform parent = null)
         {
             var previousPassThroughBuilder = (previousBuilder as PassThroughElementBuilder);
             var previousChildBuilder = previousPassThroughBuilder?.childBuilder;
 
-            return childBuilder.Build(previousChildBuilder, parent);
+            return childBuilder.Build(previousChildBuilder, pool, parent);
+        }
+
+        public void Destroy(IObjectPool pool)
+        {
+            childBuilder.Destroy(pool);
         }
     }
 }
