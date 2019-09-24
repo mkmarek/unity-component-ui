@@ -12,6 +12,9 @@ namespace UnityComponentUI.Engine
         [SerializeField]
         private UIComponentDefinition rootComponent;
 
+        [SerializeField]
+        private UIComponentIndex index;
+
         private Element rootElement;
         private IRootElementBuilder builder;
         private IRootElementBuilder previousBuilder;
@@ -21,6 +24,7 @@ namespace UnityComponentUI.Engine
 
         private void Start()
         {
+            ComponentPool.Initialize(index);
             Hooks.PrepopulateHookData();
 
             var i = ComponentPool.Instance;

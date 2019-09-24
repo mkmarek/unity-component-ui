@@ -1,10 +1,10 @@
 ﻿using UnityComponentUI.Engine.Render;
-using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace UnityComponentUI.Engine.Components.Native
 {
+    [NativeComponentRegistration("Button")]
     public class ButtonComponent : BaseLayoutComponent
     {
         public override string Name => nameof(ButtonComponent);

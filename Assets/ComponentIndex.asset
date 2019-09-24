@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fe3a16bdf994d3c94e89d615d31cd61, type: 3}
+  m_Name: ComponentIndex
+  m_EditorClassIdentifier: 
+  components:
+  - path: Assets/UnityComponentUI/Example/Counter.luax
+    component: {fileID: -6750239444755058063, guid: 9cdc0894ab8b4ec4580b1f1b2d1c077b,
+      type: 3}

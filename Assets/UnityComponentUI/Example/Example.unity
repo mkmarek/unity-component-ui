@@ -304,6 +304,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rootComponent: {fileID: -6750239444755058063, guid: 9cdc0894ab8b4ec4580b1f1b2d1c077b,
     type: 3}
+  index: {fileID: 11400000, guid: 2f16a104718ab5247989bd3a0bde620f, type: 2}
 --- !u!114 &852818942
 MonoBehaviour:
   m_ObjectHideFlags: 0

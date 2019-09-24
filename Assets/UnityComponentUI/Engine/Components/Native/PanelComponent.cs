@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 namespace UnityComponentUI.Engine.Components.Native
 {
+    [NativeComponentRegistration("Panel")]
     public class PanelComponent : BaseLayoutComponent
     {
         public override string Name => nameof(PanelComponent);

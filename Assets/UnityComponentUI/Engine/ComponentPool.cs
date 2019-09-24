@@ -1,55 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityComponentUI.Engine.Components;
 using UnityComponentUI.Engine.Components.Native;
-using UnityEditor;
-using UnityEngine;
 
 namespace UnityComponentUI.Engine
 {
     public class ComponentPool : IComponentPool
     {
-        private static ComponentPool instance;
-
-        public static ComponentPool Instance => instance ?? (instance = new ComponentPool());
+        public static ComponentPool Instance { get; private set; }
 
         private readonly Dictionary<string, Func<IBaseUIComponent>> components;
 
-        public ComponentPool()
+        public static void Initialize(UIComponentIndex index)
         {
-            components = new Dictionary<string, Func<IBaseUIComponent>>
-            {
-                { "Panel", () => new PanelComponent() },
-                { "Button", () => new ButtonComponent() },
-                { "Text", () => new TextComponent() }
-            };
+            Instance = new ComponentPool(index);
+        }
 
-            var foundObjects = GetAllInstances<UIComponentDefinition>();
+        public ComponentPool(UIComponentIndex index)
+        {
+            components = new Dictionary<string, Func<IBaseUIComponent>>();
 
-            foreach (var obj in foundObjects)
+            AddNativeComponents();
+
+            foreach (var obj in index.Components)
             {
-                components.Add(obj.ComponentName, () => obj.Create());
+                var component = obj.Component.Create();
+                components.Add(obj.Component.ComponentName, () => component);
+            }
+        }
+
+        private void AddNativeComponents()
+        {
+            var typesWithMyAttribute =
+                from a in AppDomain.CurrentDomain.GetAssemblies()
+                from t in a.GetTypes()
+                let attribute = t.GetCustomAttribute<NativeComponentRegistrationAttribute>(true)
+                where attribute != null
+                select new { Type = t, Attribute = attribute };
+
+            foreach (var record in typesWithMyAttribute)
+            {
+                components.Add(record.Attribute.MarkupName, () => (IBaseUIComponent)Activator.CreateInstance(record.Type));
             }
         }
 
         public IBaseUIComponent GetComponentByName(string name)
         {
             return components.ContainsKey(name) ? components[name]() : null;
-        }
-
-        public static T[] GetAllInstances<T>() where T : ScriptableObject
-        {
-            var guids = AssetDatabase.FindAssets("t:" + typeof(T).Name);
-            var a = new T[guids.Length];
-
-            for (int i = 0; i < guids.Length; i++)
-            {
-                var path = AssetDatabase.GUIDToAssetPath(guids[i]);
-                a[i] = AssetDatabase.LoadAssetAtPath<T>(path);
-            }
-
-            return a;
-
         }
     }
 }

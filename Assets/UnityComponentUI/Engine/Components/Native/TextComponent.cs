@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 namespace UnityComponentUI.Engine.Components.Native
 {
+    [NativeComponentRegistration("Text")]
     public class TextComponent : BaseLayoutComponent
     {
         public override string Name => nameof(TextComponent);
