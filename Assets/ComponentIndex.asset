@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: ComponentIndex
   m_EditorClassIdentifier: 
   components:
-  - path: Assets/UnityComponentUI/Example/Counter.luax
+  - path: Assets/Documentation/Example/Counter.luax
     component: {fileID: -6750239444755058063, guid: 9cdc0894ab8b4ec4580b1f1b2d1c077b,
       type: 3}
