@@ -1,0 +1,24 @@
+name: PublishPackage
+on:
+  push:
+    branches:
+    - master
+jobs:
+  copycat:
+    name: Copycat
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Copycat
+      uses: andstor/copycat-action@v1.1.0
+      env:
+        DST_BRANCH: upm
+        DST_OWNER: mkmarek
+        DST_REPO_NAME: unity-component-ui
+        DST_PATH: /
+        GH_PAT: ${{ secrets.GH_PAT }}
+        SRC_BRANCH: master
+        SRC_PATH: /Assets/Package
+        SRC_WIKI: "false"
+        USERNAME: mkmarek
+        EMAIL: marek.magdziak@hotmail.cz
