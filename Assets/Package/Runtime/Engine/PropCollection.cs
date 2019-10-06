@@ -12,6 +12,12 @@ namespace UnityComponentUI.Engine
 
         public PropCollection(IDictionary<string, object> props) : base(props ?? new Dictionary<string, object>())
         {
+            foreach (var prop in props)
+            {
+                var cb = GetCallbackAction(prop.Key);
+
+                if (cb != null) this[prop.Key] = cb;
+            }
         }
 
         public static void FlushCallbacks()
@@ -20,9 +26,8 @@ namespace UnityComponentUI.Engine
             foreach (var callback in copy)
             {
                 callback?.Invoke();
+                pendingCallbacks.Remove(callback);
             }
-
-            pendingCallbacks.Clear();
         }
 
         public IEnumerable<Element> GetElements(string key)
@@ -82,6 +87,11 @@ namespace UnityComponentUI.Engine
             if (this[key] is Closure cl)
             {
                 return () => pendingCallbacks.Add(() => cl.Call());
+            }
+
+            if (this[key] is Action action)
+            {
+                return action;
             }
 
             return null;

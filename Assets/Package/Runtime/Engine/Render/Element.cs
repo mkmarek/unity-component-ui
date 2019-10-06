@@ -38,6 +38,8 @@ namespace UnityComponentUI.Engine.Render
 
         public static Element GetById(string id)
         {
+            if (string.IsNullOrWhiteSpace(id)) return null;
+
             return Elements.ContainsKey(id) ? Elements[id] : null;
         }
 

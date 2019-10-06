@@ -19,8 +19,10 @@ namespace UnityComponentUI.Engine
         private IRootElementBuilder builder;
         private IRootElementBuilder previousBuilder;
         private bool changed;
+        private bool isDestroyed;
 
         private static object _locker = new object();
+        private Thread renderThread;
 
         private void Start()
         {
@@ -30,9 +32,9 @@ namespace UnityComponentUI.Engine
             var i = ComponentPool.Instance;
             rootElement = Element.Create(rootComponent.Create(), new PropCollection(new Dictionary<string, object>()));
 
-            var t = new Thread(() =>
+            renderThread = new Thread(() =>
             {
-                while (true)
+                while (!isDestroyed)
                 {
                     try
                     {
@@ -43,10 +45,16 @@ namespace UnityComponentUI.Engine
 
                         lock (_locker)
                         {
-                            previousBuilder = builder;
+                            if (!(builder is NoopElementBuilder))
+                            {
+                                previousBuilder = builder;
+                            }
+
                             builder = newBuilder;
                             changed = true;
                         }
+
+                        GC.Collect();
                     }
                     catch (Exception ex)
                     {
@@ -55,7 +63,7 @@ namespace UnityComponentUI.Engine
                 }
             });
 
-            t.Start();
+            renderThread.Start();
         }
 
         private void Update()
@@ -67,6 +75,11 @@ namespace UnityComponentUI.Engine
             builder.Build(previousBuilder, this);
 
             changed = false;
+        }
+
+        private void OnDestroy()
+        {
+            isDestroyed = true;
         }
 
         public void MarkForDestruction(GameObject go)
