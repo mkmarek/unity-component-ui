@@ -65,6 +65,18 @@ namespace UnityComponentUI.Engine.Render
                     ? null
                     : previousGameObjectElementBuilder?.childBuilders[i];
 
+                if (childBuilders[i] == null && previousChildBuilder != null)
+                {
+                    previousChildBuilder.Destroy(pool);
+                }
+
+                if (childBuilders[i] == null) continue;
+
+                if (childBuilders[i] is NoopElementBuilder)
+                {
+                    childBuilders[i] = previousChildBuilder;
+                }
+
                 var childObjects = childBuilders[i].Build(
                     previousChildBuilder,
                     pool,
@@ -98,6 +110,8 @@ namespace UnityComponentUI.Engine.Render
 
             foreach (var element in elements)
             {
+                if (element == null) continue;
+
                 AddChildBuilder(element.Render());
             }
         }

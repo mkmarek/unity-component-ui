@@ -40,7 +40,7 @@ namespace UnityComponentUI.Engine.Components
                 haveChanged = true;
             }
 
-            if (!haveChanged) return null;
+            if (!haveChanged) return new NoopElementBuilder();
 
             Hooks.CurrentComponent = this;
             currentHookIndex = 0;
@@ -51,6 +51,11 @@ namespace UnityComponentUI.Engine.Components
 
             previousProps = props;
 
+            if (element == null)
+            {
+                return null;
+            }
+
             return new PassThroughElementBuilder(element.Render());
         }
 
@@ -59,6 +64,7 @@ namespace UnityComponentUI.Engine.Components
             if (currentHooks.Count <= currentHookIndex)
             {
                 currentHooks.Add(hook);
+                currentHookIndex++;
                 return hook;
             }
 
