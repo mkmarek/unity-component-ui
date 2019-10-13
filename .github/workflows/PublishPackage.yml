@@ -27,6 +27,11 @@ jobs:
         git config --global user.email "marek.magdziak@hotmail.cz"
         git config --global user.name "Marek Magdziak"
         git checkout package
+
+        mv .git ../
+        rm -rf ./*
+        mv ../.git .git
+
         cp -r ../Package/* .
         git add -A
         git commit -m "Create package"
