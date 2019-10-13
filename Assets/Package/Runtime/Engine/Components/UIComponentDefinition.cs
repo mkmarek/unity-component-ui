@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MoonSharp.Interpreter;
+using UnityComponentUI.Engine.Hooks;
 using UnityComponentUI.Engine.Render;
 using UnityEngine;
 
@@ -41,8 +42,9 @@ namespace UnityComponentUI.Engine.Components
             var state = new Script();
 
             state.Globals["Create"] = (Func<string, IDictionary<string, object>, string>)Element.Create;
-            state.Globals["UseScreenSize"] = (Func<object>)Hooks.UseScreenSize;
-            state.Globals["UseState"] = (Func<object, IDictionary<string, object>>)Hooks.UseState;
+            state.Globals["UseScreenSize"] = (Func<object>)ScreenSizeHook.Use;
+            state.Globals["UseState"] = (Func<object, IDictionary<string, object>>)StateHook.Use;
+            state.Globals["UseSystem"] = (Func<string, IDictionary<string, object>>)SystemHook.Use;
 
             state.DoString(markup);
 

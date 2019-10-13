@@ -12,13 +12,15 @@ namespace UnityComponentUI.Engine.Render
         private List<IRootElementBuilder> childBuilders;
         private string name;
 
+        public string Path { get; private set; }
         public GameObject RootGameObject { get; private set; }
 
-        public GameObjectElementBuilder(string name) : base(typeof(GameObject))
+        public GameObjectElementBuilder(string name, string path) : base(typeof(GameObject))
         {
             components = new List<ComponentElementBuilder>();
             childBuilders = new List<IRootElementBuilder>();
             this.name = name;
+            Path = path;
         }
 
         public ComponentElementBuilder<TComponent> AddComponent<TComponent>()
@@ -76,11 +78,6 @@ namespace UnityComponentUI.Engine.Render
                 {
                     childBuilders[i] = previousChildBuilder;
                 }
-
-                var childObjects = childBuilders[i].Build(
-                    previousChildBuilder,
-                    pool,
-                    RootGameObject.transform);
             }
 
             if (childBuilders.Count < previousGameObjectElementBuilder?.childBuilders.Count)
@@ -108,11 +105,10 @@ namespace UnityComponentUI.Engine.Render
         {
             if (elements == null) return;
 
+            var i = 0;
             foreach (var element in elements)
             {
-                if (element == null) continue;
-
-                AddChildBuilder(element.Render());
+                element?.Render(this, i++);
             }
         }
     }

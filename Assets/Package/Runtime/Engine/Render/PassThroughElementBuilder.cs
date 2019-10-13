@@ -11,6 +11,9 @@ namespace UnityComponentUI.Engine.Render
             childBuilder = builder;
         }
 
+        public GameObject RootGameObject => childBuilder.RootGameObject;
+        public string Path => childBuilder.Path;
+
         public GameObject Build(IRootElementBuilder previousBuilder, IObjectPool pool, Transform parent = null)
         {
             var previousPassThroughBuilder = (previousBuilder as PassThroughElementBuilder);
@@ -22,6 +25,11 @@ namespace UnityComponentUI.Engine.Render
         public void Destroy(IObjectPool pool)
         {
             childBuilder.Destroy(pool);
+        }
+
+        public void AddChildBuilder(IRootElementBuilder builder)
+        {
+
         }
     }
 }

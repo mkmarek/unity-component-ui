@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityComponentUI.Engine.Render;
 using MoonSharp.Interpreter;
+using UnityEngine;
 
 namespace UnityComponentUI.Engine
 {
@@ -25,7 +26,7 @@ namespace UnityComponentUI.Engine
             var copy = pendingCallbacks.ToList();
             foreach (var callback in copy)
             {
-                callback?.Invoke();
+                try { callback?.Invoke();} catch(Exception ex) { Debug.LogError(ex); }
                 pendingCallbacks.Remove(callback);
             }
         }
