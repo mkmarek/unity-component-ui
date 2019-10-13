@@ -1,4 +1,5 @@
-﻿using UnityComponentUI.Engine.Components;
+﻿using System.Linq;
+using UnityComponentUI.Engine.Components;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,6 +10,7 @@ namespace Assets.UnityComponentUI.Editor
         static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
         {
             var index = AssetDatabase.LoadAssetAtPath<UIComponentIndex>("Assets/ComponentIndex.asset");
+            var isDirty = false;
 
             if (index == null)
             {
@@ -25,13 +27,21 @@ namespace Assets.UnityComponentUI.Editor
 
                 index.Components.RemoveAll(e => e.Path == path);
                 index.Components.Add(new UIComponentIndexItem { Path = path, Component = component});
+                isDirty = true;
             }
             foreach (string str in deletedAssets)
             {
-                index.Components.RemoveAll(e => e.Path == str);
+                if (index.Components.RemoveAll(e => e.Path == str) > 0)
+                {
+                    isDirty = true;
+                }
             }
 
-            AssetDatabase.SaveAssets();
+            if (isDirty)
+            {
+                EditorUtility.SetDirty(index);
+                AssetDatabase.SaveAssets();
+            }
         }
     }
 }

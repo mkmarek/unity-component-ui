@@ -12,10 +12,13 @@ namespace UnityComponentUI.Engine.Render
 
         public PropCollection Props { get; }
 
-        private Element(IBaseUIComponent component, PropCollection props = null)
+        public string Id { get; }
+
+        private Element(string id, IBaseUIComponent component, PropCollection props = null)
         {
             this.Component = component;
             this.Props = props;
+            this.Id = id;
         }
 
         public static string Create(string name, IDictionary<string, object> props = null)
@@ -23,6 +26,7 @@ namespace UnityComponentUI.Engine.Render
             var id = Guid.NewGuid().ToString();
 
             var element = new Element(
+                id,
                 ComponentPool.Instance.GetComponentByName(name),
                 new PropCollection(props));
 
@@ -33,7 +37,9 @@ namespace UnityComponentUI.Engine.Render
 
         public static Element Create(IBaseUIComponent component, PropCollection props = null)
         {
-            return new Element(component, props);
+            var id = "root";
+
+            return new Element(id, component, props);
         }
 
         public static Element GetById(string id)
@@ -43,11 +49,9 @@ namespace UnityComponentUI.Engine.Render
             return Elements.ContainsKey(id) ? Elements[id] : null;
         }
 
-        public IRootElementBuilder Render()
+        public void Render(IRootElementBuilder parent, int? key = null)
         {
-            var builder = this.Component.Render(this);
-
-            return builder;
+            this.Component.Render(parent, this, key);
         }
     }
 }
