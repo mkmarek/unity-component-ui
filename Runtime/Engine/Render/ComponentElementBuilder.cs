@@ -24,14 +24,15 @@ namespace UnityComponentUI.Engine.Render
             {
                 var value = valuesForSetters.ContainsKey(key)
                     ? valuesForSetters[key]
-                    : valueFactoriesForSetters[key].DynamicInvoke();
+                    : null;
 
-                var existing = ReflectionUtils.GetProperty(component, setters[key]);
+                var previousValue = previousBuilder?.valuesForSetters.ContainsKey(key) == true
+                    ? previousBuilder?.valuesForSetters[key]
+                    : null;
 
-                if (existing == null || !existing.Equals(value))
-                {
-                    ReflectionUtils.SetProperty(component, setters[key], value);
-                }
+                if (previousValue != null && previousValue.Equals(value)) continue;
+
+                ReflectionUtils.SetProperty(component, setters[key], value);
             }
 
             return component;
@@ -46,17 +47,6 @@ namespace UnityComponentUI.Engine.Render
             var key = ReflectionUtils.GetPropertyChain(property);
             setters.Add(key, property);
             valuesForSetters.Add(key, value);
-
-            return this;
-        }
-
-        public ComponentElementBuilder<TElement> SetPropertyDelayed<TValue>(
-            Expression<Func<TElement, TValue>> property, Func<TValue> value)
-        {
-            var key = ReflectionUtils.GetPropertyChain(property);
-
-            setters.Add(key, property);
-            valueFactoriesForSetters.Add(key, value);
 
             return this;
         }

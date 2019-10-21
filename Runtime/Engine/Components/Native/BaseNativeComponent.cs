@@ -5,11 +5,12 @@ namespace UnityComponentUI.Engine.Components.Native
 {
     public abstract class BaseNativeComponent : IBaseUIComponent
     {
-        public void Render(IRootElementBuilder parent, Element container, int? key = null)
+        public void Render(IRootElementBuilder parent, Element container, int? key = null, bool initial = false)
         {
             var builder = new GameObjectElementBuilder(
                 container.Component.Name,
-                $"{parent?.Path ?? "root"}{(key.HasValue ? $"|{key}" : "")}|{container.Component.Name}");
+                container.Path,
+                initial);
 
             this.Render(builder, container.Props);
 

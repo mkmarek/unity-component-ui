@@ -13,8 +13,6 @@ namespace UnityComponentUI.Editor
     {
         private readonly Interpreter interpreter;
 
-        public string boundSystem;
-
         public LuaxImporter()
         {
             interpreter = new Interpreter();
@@ -25,7 +23,6 @@ namespace UnityComponentUI.Editor
             var content = File.ReadAllText(ctx.assetPath);
 
             var obj = interpreter.Interpret(content, ctx.assetPath);
-            obj.BoundSystem = boundSystem;
 
             ctx.AddObjectToAsset("main", obj);
             ctx.SetMainObject(obj);

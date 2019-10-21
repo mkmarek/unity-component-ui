@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using UnityComponentUI.Engine.Utils;
 using UnityEngine;
@@ -9,17 +10,20 @@ namespace UnityComponentUI.Engine.Render
     public class GameObjectElementBuilder : ElementBuilder, IRootElementBuilder
     {
         protected readonly List<ComponentElementBuilder> components;
-        private List<IRootElementBuilder> childBuilders;
+        private readonly List<IRootElementBuilder> childBuilders;
+        private IEnumerable<Element> childElements;
         private string name;
+        private readonly bool initialRenderer;
 
         public string Path { get; private set; }
         public GameObject RootGameObject { get; private set; }
 
-        public GameObjectElementBuilder(string name, string path) : base(typeof(GameObject))
+        public GameObjectElementBuilder(string name, string path, bool initialRenderer) : base(typeof(GameObject))
         {
             components = new List<ComponentElementBuilder>();
             childBuilders = new List<IRootElementBuilder>();
             this.name = name;
+            this.initialRenderer = initialRenderer;
             Path = path;
         }
 
@@ -45,9 +49,40 @@ namespace UnityComponentUI.Engine.Render
         {
             var previousGameObjectElementBuilder = previousBuilder as GameObjectElementBuilder;
 
+            if (childElements != null)
+            {
+                var elementCount = childElements.Count();
+
+                for (var i = 0; i < elementCount; i++)
+                {
+                    var element = childElements.ElementAt(i);
+                    if (previousGameObjectElementBuilder == null || initialRenderer)
+                    {
+                        element?.Render(this, i, initialRenderer);
+                    }
+                    else if (previousGameObjectElementBuilder.childElements.Count() <= i)
+                    {
+                        element?.Render(this, i, initialRenderer);
+                    }
+                    else if (!previousGameObjectElementBuilder.childElements.ElementAt(i).Props.Equals(element.Props))
+                    {
+                        element?.Render(this, i, initialRenderer);
+                    }
+                    else
+                    {
+                        var builder = previousGameObjectElementBuilder.childBuilders[i];
+                        RenderQueue.Instance.Enqueue(new RenderQueueItem
+                        {
+                            RenderAction = () => builder,
+                            Parent = this,
+                        });
+                    }
+                }
+            }
+
             RootGameObject = previousGameObjectElementBuilder?.RootGameObject != null
                 ? previousGameObjectElementBuilder?.RootGameObject
-                : new GameObject(name);
+                : new GameObject(Path);
 
             RootGameObject.transform.SetParent(parent ? parent : pool.Root);
 
@@ -58,7 +93,11 @@ namespace UnityComponentUI.Engine.Render
 
             foreach (var key in setters.Keys)
             {
-                ReflectionUtils.SetProperty(RootGameObject, setters[key], valuesForSetters[key]);
+                if (previousGameObjectElementBuilder?.valuesForSetters.ContainsKey(key) != true ||
+                    !previousGameObjectElementBuilder.valuesForSetters[key].Equals(valuesForSetters[key]))
+                {
+                    ReflectionUtils.SetProperty(RootGameObject, setters[key], valuesForSetters[key]);
+                }
             }
 
             for (var i = 0; i < childBuilders.Count; i++)
@@ -67,9 +106,9 @@ namespace UnityComponentUI.Engine.Render
                     ? null
                     : previousGameObjectElementBuilder?.childBuilders[i];
 
-                if (childBuilders[i] == null && previousChildBuilder != null)
+                if (childBuilders[i] == null)
                 {
-                    previousChildBuilder.Destroy(pool);
+                    previousChildBuilder?.Destroy(pool);
                 }
 
                 if (childBuilders[i] == null) continue;
@@ -103,13 +142,7 @@ namespace UnityComponentUI.Engine.Render
 
         public void RenderElements(IEnumerable<Element> elements)
         {
-            if (elements == null) return;
-
-            var i = 0;
-            foreach (var element in elements)
-            {
-                element?.Render(this, i++);
-            }
+            childElements = elements;
         }
     }
 }
