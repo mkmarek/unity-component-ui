@@ -230,7 +230,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 723045126}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1077351063, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_HorizontalAxis: Horizontal
@@ -249,7 +249,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 723045126}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -619905303, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_FirstSelected: {fileID: 0}
@@ -281,8 +281,8 @@ GameObject:
   - component: {fileID: 852818944}
   - component: {fileID: 852818943}
   - component: {fileID: 852818942}
-  - component: {fileID: 852818941}
   - component: {fileID: 852818946}
+  - component: {fileID: 852818941}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -314,7 +314,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 852818940}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1301386320, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_IgnoreReversedGraphics: 1
@@ -331,7 +331,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 852818940}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1980459831, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_UiScaleMode: 0

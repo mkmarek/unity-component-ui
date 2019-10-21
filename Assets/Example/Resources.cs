@@ -8,7 +8,7 @@ namespace UnityComponentUI.Example
         [SerializeField]
         private Object[] resources;
 
-        private void Start()
+        private void Awake()
         {
             foreach (var resource in resources)
             {

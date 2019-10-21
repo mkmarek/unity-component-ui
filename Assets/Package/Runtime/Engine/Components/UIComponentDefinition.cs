@@ -31,12 +31,6 @@ namespace UnityComponentUI.Engine.Components
             set => markup = value;
         }
 
-        public string BoundSystem
-        {
-            get => boundSystem;
-            set => boundSystem = value;
-        }
-
         public UIComponent Create()
         {
             var state = new Script();
@@ -45,10 +39,11 @@ namespace UnityComponentUI.Engine.Components
             state.Globals["UseScreenSize"] = (Func<object>)ScreenSizeHook.Use;
             state.Globals["UseState"] = (Func<object, IDictionary<string, object>>)StateHook.Use;
             state.Globals["UseSystem"] = (Func<string, IDictionary<string, object>>)SystemHook.Use;
+            state.Globals["UseMousePosition"] = (Func<IDictionary<string, object>>)MousePositionHook.Use;
 
             state.DoString(markup);
 
-            return new UIComponent(componentName, state, ConnectedSystemRegistry.Instance.Get(boundSystem));
+            return new UIComponent(componentName, state);
         }
     }
 }

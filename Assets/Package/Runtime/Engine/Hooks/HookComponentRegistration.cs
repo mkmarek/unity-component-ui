@@ -12,19 +12,19 @@ namespace Assets.Package.Runtime.Engine.Hooks
         public static Element CurrentContainer { get; set; }
         public static int? CurrentKey { get; set; }
 
-        private static Dictionary<Element, List<(BaseHook hook, Action invalidate)>> hooksBoundToComponents =
+        private static readonly Dictionary<Element, List<(BaseHook hook, Action invalidate)>> HooksBoundToComponents =
             new Dictionary<Element, List<(BaseHook hook, Action invalidate)>>();
 
         private static int _componentHookCounter = 0;
 
         public static BaseHook GetOrRegisterHook(BaseHook hook)
         {
-            if (!hooksBoundToComponents.ContainsKey(CurrentContainer))
+            if (!HooksBoundToComponents.ContainsKey(CurrentContainer))
             {
-                hooksBoundToComponents.Add(CurrentContainer, new List<(BaseHook hook, Action invalidate)>());
+                HooksBoundToComponents.Add(CurrentContainer, new List<(BaseHook hook, Action invalidate)>());
             }
 
-            var binding = hooksBoundToComponents[CurrentContainer];
+            var binding = HooksBoundToComponents[CurrentContainer];
 
             if (_componentHookCounter < binding.Count)
             {
@@ -47,7 +47,7 @@ namespace Assets.Package.Runtime.Engine.Hooks
 
         public static void InvalidateHooks(Predicate<BaseHook> predicate)
         {
-            foreach (var binding in hooksBoundToComponents)
+            foreach (var binding in HooksBoundToComponents)
             {
                 foreach (var hook in binding.Value)
                 {

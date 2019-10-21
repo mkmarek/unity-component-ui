@@ -14,21 +14,43 @@ namespace UnityComponentUI.Engine.Render
 
         public string Id { get; }
 
-        private Element(string id, IBaseUIComponent component, PropCollection props = null)
+        public string Path { get; private set; }
+
+        private Element(string id, string path, IBaseUIComponent component, PropCollection props = null)
         {
             this.Component = component;
             this.Props = props;
             this.Id = id;
+            this.Path = path;
+        }
+
+        public void SetContainer(Element container)
+        {
+            this.Path = $"{container.Path}|{Path}";
+            PrependPath(this.Path);
+        }
+
+        public void PrependPath(string path)
+        {
+            var childElements = Props.GetElements("children");
+            var index = 0;
+            foreach (var el in childElements)
+            {
+                el.Path = $"{path}|{el.Path}|{index++}";
+                el.PrependPath(el.Path);
+            }
         }
 
         public static string Create(string name, IDictionary<string, object> props = null)
         {
             var id = Guid.NewGuid().ToString();
+            var propCollection = new PropCollection(props);
 
             var element = new Element(
                 id,
+                name,
                 ComponentPool.Instance.GetComponentByName(name),
-                new PropCollection(props));
+                propCollection);
 
             Elements.Add(id, element);
 
@@ -39,7 +61,7 @@ namespace UnityComponentUI.Engine.Render
         {
             var id = "root";
 
-            return new Element(id, component, props);
+            return new Element(id, id, component, props);
         }
 
         public static Element GetById(string id)
@@ -49,9 +71,9 @@ namespace UnityComponentUI.Engine.Render
             return Elements.ContainsKey(id) ? Elements[id] : null;
         }
 
-        public void Render(IRootElementBuilder parent, int? key = null)
+        public void Render(IRootElementBuilder parent, int? key = null, bool initial = false)
         {
-            this.Component.Render(parent, this, key);
+            this.Component.Render(parent, this, key, initial);
         }
     }
 }

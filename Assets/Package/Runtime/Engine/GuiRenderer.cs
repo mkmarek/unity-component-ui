@@ -20,15 +20,17 @@ namespace UnityComponentUI.Engine
         {
             ComponentPool.Initialize(index);
             ScreenSizeHook.Prepopulate();
+            MousePositionHook.Prepopulate();
 
             var rootElement = Element.Create(rootComponent.Create(), new PropCollection(new Dictionary<string, object>()));
-            rootElement.Render(null);
+            rootElement.Render(null, initial: true);
         }
 
         private void Update()
         {
             SystemHook.Prepopulate();
             ScreenSizeHook.Prepopulate();
+            MousePositionHook.Prepopulate();
             PropCollection.FlushCallbacks();
 
             RenderQueue.Instance.DoUnitOfWork(this, this.transform);

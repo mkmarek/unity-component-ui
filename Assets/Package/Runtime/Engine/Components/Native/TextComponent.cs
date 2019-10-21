@@ -1,4 +1,6 @@
-﻿using UnityComponentUI.Engine.Render;
+﻿using System;
+using System.Linq.Expressions;
+using UnityComponentUI.Engine.Render;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +9,12 @@ namespace UnityComponentUI.Engine.Components.Native
     [NativeComponentRegistration("Text")]
     public class TextComponent : BaseLayoutComponent
     {
+        private static readonly Expression<Func<Text, Font>> Font = e => e.font;
+        private static readonly Expression<Func<Text, Color>> ColorProp = e => e.color;
+        private static readonly Expression<Func<Text, string>> Text = e => e.text;
+        private static readonly Expression<Func<Text, TextAnchor>> Alignment = e => e.alignment;
+        private static readonly Expression<Func<Text, bool>> AlignByGeometry = e => e.alignByGeometry;
+
         public override string Name => nameof(TextComponent);
 
         public override void Render(GameObjectElementBuilder builder, PropCollection props)
@@ -19,11 +27,11 @@ namespace UnityComponentUI.Engine.Components.Native
             var alignment = props.GetEnum("textAnchor", TextAnchor.UpperLeft);
             var alignByGeometry = props.GetString("alignByGeometry", "false");
 
-            text.SetPropertyDelayed(e => e.font, () => ComponentResources.Get("ArialFont"));
-            text.SetProperty(e => e.color, Color.black);
-            text.SetProperty(e => e.text, textValue);
-            text.SetProperty(e => e.alignment, alignment);
-            text.SetProperty(e => e.alignByGeometry, alignByGeometry == "true");
+            text.SetProperty(Font, ComponentResources.Get("ArialFont") as Font);
+            text.SetProperty(ColorProp, Color.black);
+            text.SetProperty(Text, textValue);
+            text.SetProperty(Alignment, alignment);
+            text.SetProperty(AlignByGeometry, alignByGeometry == "true");
         }
     }
 }

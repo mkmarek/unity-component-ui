@@ -10,19 +10,18 @@ namespace UnityComponentUI.Engine.Components
 
         public string Name { get; }
 
-        public UIComponent(string componentName, Script state, ConnectedSystem system)
+        public UIComponent(string componentName, Script state)
         {
             this.state = state;
             this.Name = componentName;
         }
 
-        public void Render(IRootElementBuilder parent, Element container, int? key = null)
+        public void Render(IRootElementBuilder parent, Element container, int? key = null, bool initial = false)
         {
             HookComponentRegistration.CurrentComponent = this;
             HookComponentRegistration.CurrentParent = parent;
             HookComponentRegistration.CurrentContainer = container;
             HookComponentRegistration.CurrentKey = key;
-
             HookComponentRegistration.ResetHookCounter();
 
             var elementId = state.Call(state.Globals["render"], container.Props).CastToString();
@@ -33,8 +32,9 @@ namespace UnityComponentUI.Engine.Components
             HookComponentRegistration.CurrentKey = null;
 
             var element = Element.GetById(elementId);
+            element.SetContainer(container);
 
-            element?.Render(parent, key);
+            element?.Render(parent, key, initial);
         }
     }
 }
