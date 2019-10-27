@@ -13,11 +13,14 @@ namespace UnityComponentUI.Engine
 
         public PropCollection(IDictionary<string, object> props) : base(props ?? new Dictionary<string, object>())
         {
-            foreach (var prop in props)
+            if (props != null)
             {
-                var cb = GetCallbackAction(prop.Key);
+                foreach (var prop in props)
+                {
+                    var cb = GetCallbackAction(prop.Key);
 
-                if (cb != null) this[prop.Key] = cb;
+                    if (cb != null) this[prop.Key] = cb;
+                }
             }
         }
 
@@ -107,6 +110,34 @@ namespace UnityComponentUI.Engine
             var strValue = Convert.ToString(value);
 
             return (T)Enum.Parse(typeof(T), strValue);
+        }
+
+        public override bool Equals(object other)
+        {
+            if (!(other is PropCollection collection))
+            {
+                return false;
+            }
+
+            if (this.Keys.Count != collection.Keys.Count)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < Keys.Count; i++)
+            {
+                if (!Keys.ElementAt(i).Equals(collection.Keys.ElementAt(i)))
+                {
+                    return false;
+                }
+
+                if (!Values.ElementAt(i).Equals(collection.Values.ElementAt(i)))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

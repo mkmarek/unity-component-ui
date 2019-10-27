@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityComponentUI.Engine.Components;
 using UnityComponentUI.Engine.Render;
@@ -42,12 +43,20 @@ namespace Assets.Package.Runtime.Engine.Hooks
 
             _componentHookCounter++;
 
+            foreach (var component in HooksBoundToComponents.Keys.ToList())
+            {
+                if (component.Path.Equals(CurrentContainer.Path) && component != CurrentContainer)
+                {
+                    HooksBoundToComponents.Remove(component);
+                }
+            }
+
             return hook;
         }
 
         public static void InvalidateHooks(Predicate<BaseHook> predicate)
         {
-            foreach (var binding in HooksBoundToComponents)
+            foreach (var binding in HooksBoundToComponents.ToList())
             {
                 foreach (var hook in binding.Value)
                 {
@@ -55,6 +64,17 @@ namespace Assets.Package.Runtime.Engine.Hooks
                     {
                         hook.invalidate();
                     }
+                }
+            }
+        }
+
+        public static void DeregisterComponents(string path)
+        {
+            foreach (var component in HooksBoundToComponents.Keys.ToList())
+            {
+                if (component.Path.StartsWith(path) || component.Path.Equals(path))
+                {
+                    HooksBoundToComponents.Remove(component);
                 }
             }
         }
