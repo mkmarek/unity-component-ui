@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityComponentUI.Engine.Components;
 using UnityComponentUI.Engine.Render;
 using UnityEngine;
@@ -18,6 +19,17 @@ namespace UnityComponentUI.Engine
         private readonly Dictionary<string, IRootElementBuilder> componentToBuilder = new Dictionary<string, IRootElementBuilder>();
 
         public static RenderQueue Instance => _instance ?? (_instance = new RenderQueue());
+
+        public void DeregisterBuilders(string path)
+        {
+            foreach (var key in componentToBuilder.Keys.ToList())
+            {
+                if (key.StartsWith(path) || path.Equals(key))
+                {
+                    componentToBuilder.Remove(key);
+                }
+            }
+        }
 
         public void DoUnitOfWork(IObjectPool pool, Transform root)
         {

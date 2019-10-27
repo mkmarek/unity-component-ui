@@ -32,8 +32,8 @@ namespace UnityComponentUI.Engine.Components
             HookComponentRegistration.CurrentKey = null;
 
             var element = Element.GetById(elementId);
-            element.SetContainer(container);
 
+            element?.SetContainer(container);
             element?.Render(parent, key, initial);
         }
     }

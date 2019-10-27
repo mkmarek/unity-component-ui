@@ -36,8 +36,11 @@ namespace UnityComponentUI.Engine.Render
             var index = 0;
             foreach (var el in childElements)
             {
-                el.Path = $"{path}|{el.Path}|{index++}";
-                el.PrependPath(el.Path);
+                if (el != null)
+                {
+                    el.Path = $"{path}|{el.Path}|{index++}";
+                    el.PrependPath(el.Path);
+                }
             }
         }
 

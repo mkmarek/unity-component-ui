@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Assets.Package.Runtime.Engine.Hooks;
 using UnityComponentUI.Engine.Utils;
 using UnityEngine;
 
@@ -64,12 +65,17 @@ namespace UnityComponentUI.Engine.Render
                     {
                         element?.Render(this, i, initialRenderer);
                     }
-                    else if (!previousGameObjectElementBuilder.childElements.ElementAt(i).Props.Equals(element.Props))
+                    else if (previousGameObjectElementBuilder.childElements.ElementAt(i)?.Props.Equals(element.Props) != true)
                     {
                         element?.Render(this, i, initialRenderer);
                     }
                     else
                     {
+                        if (previousGameObjectElementBuilder.childBuilders.Count <= i)
+                        {
+                            continue;
+                        }
+
                         var builder = previousGameObjectElementBuilder.childBuilders[i];
                         RenderQueue.Instance.Enqueue(new RenderQueueItem
                         {
@@ -119,11 +125,16 @@ namespace UnityComponentUI.Engine.Render
                 }
             }
 
-            if (childBuilders.Count < previousGameObjectElementBuilder?.childBuilders.Count)
+            if (previousGameObjectElementBuilder != null)
             {
-                for (var i = childBuilders.Count; i < previousGameObjectElementBuilder.childBuilders.Count; i++)
+                var currentKeys = childBuilders.Select(e => e.Path).ToList();
+
+                foreach (var builder in previousGameObjectElementBuilder.childBuilders)
                 {
-                    previousGameObjectElementBuilder.childBuilders[i].Destroy(pool);
+                    if (!currentKeys.Contains(builder.Path))
+                    {
+                        builder.Destroy(pool);
+                    }
                 }
             }
 
@@ -132,6 +143,8 @@ namespace UnityComponentUI.Engine.Render
 
         public void Destroy(IObjectPool pool)
         {
+            RenderQueue.Instance.DeregisterBuilders(this.Path);
+            HookComponentRegistration.DeregisterComponents(this.Path);
             pool.MarkForDestruction(RootGameObject);
         }
 
