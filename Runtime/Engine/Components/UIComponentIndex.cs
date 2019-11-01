@@ -25,7 +25,7 @@ namespace UnityComponentUI.Engine.Components
     }
 
     [Serializable]
-    public class UIComponentIndex : ScriptableObject
+    public class UIComponentIndex : ScriptableObject, IComponentIndex
     {
         [SerializeField]
         private List<UIComponentIndexItem> components;

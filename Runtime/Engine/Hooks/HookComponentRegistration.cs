@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using UnityComponentUI.Engine;
 using UnityComponentUI.Engine.Components;
 using UnityComponentUI.Engine.Render;
 
@@ -9,12 +10,10 @@ namespace Assets.Package.Runtime.Engine.Hooks
     public static class HookComponentRegistration
     {
         public static UIComponent CurrentComponent { get; set; }
-        public static IRootElementBuilder CurrentParent { get; set; }
         public static Element CurrentContainer { get; set; }
-        public static int? CurrentKey { get; set; }
 
-        private static readonly Dictionary<Element, List<(BaseHook hook, Action invalidate)>> HooksBoundToComponents =
-            new Dictionary<Element, List<(BaseHook hook, Action invalidate)>>();
+        private static readonly Dictionary<Element, List<BaseHook>> HooksBoundToComponents =
+            new Dictionary<Element, List<BaseHook>>();
 
         private static int _componentHookCounter = 0;
 
@@ -22,34 +21,19 @@ namespace Assets.Package.Runtime.Engine.Hooks
         {
             if (!HooksBoundToComponents.ContainsKey(CurrentContainer))
             {
-                HooksBoundToComponents.Add(CurrentContainer, new List<(BaseHook hook, Action invalidate)>());
+                HooksBoundToComponents.Add(CurrentContainer, new List<BaseHook>());
             }
 
             var binding = HooksBoundToComponents[CurrentContainer];
 
             if (_componentHookCounter < binding.Count)
             {
-                return binding[_componentHookCounter++].hook;
+                return binding[_componentHookCounter++];
             }
-
-            var parent = CurrentParent;
-            var container = CurrentContainer;
-            var key = CurrentKey;
-
-            binding.Add((hook, () =>
-            {
-                container.Render(parent, key);
-            }));
+            
+            binding.Add(hook);
 
             _componentHookCounter++;
-
-            foreach (var component in HooksBoundToComponents.Keys.ToList())
-            {
-                if (component.Path.Equals(CurrentContainer.Path) && component != CurrentContainer)
-                {
-                    HooksBoundToComponents.Remove(component);
-                }
-            }
 
             return hook;
         }
@@ -60,21 +44,11 @@ namespace Assets.Package.Runtime.Engine.Hooks
             {
                 foreach (var hook in binding.Value)
                 {
-                    if (predicate(hook.hook))
+                    if (predicate(hook))
                     {
-                        hook.invalidate();
+                        binding.Key.Invalidated = true;
+                        RenderQueue.Instance.Enqueue(new RenderQueueItem { elementToUpdate = binding.Key });
                     }
-                }
-            }
-        }
-
-        public static void DeregisterComponents(string path)
-        {
-            foreach (var component in HooksBoundToComponents.Keys.ToList())
-            {
-                if (component.Path.StartsWith(path) || component.Path.Equals(path))
-                {
-                    HooksBoundToComponents.Remove(component);
                 }
             }
         }
@@ -82,6 +56,11 @@ namespace Assets.Package.Runtime.Engine.Hooks
         public static void ResetHookCounter()
         {
             _componentHookCounter = 0;
+        }
+
+        public static void RemoveHooksFor(Element element)
+        {
+            HooksBoundToComponents.Remove(element);
         }
     }
 }

@@ -16,18 +16,27 @@ namespace UnityComponentUI.Engine
         [SerializeField]
         private UIComponentIndex index;
 
+        private bool built = false;
+
         private void Start()
         {
             ComponentPool.Initialize(index);
             ScreenSizeHook.Prepopulate();
             MousePositionHook.Prepopulate();
-
-            var rootElement = Element.Create(rootComponent.Create(), new PropCollection(new Dictionary<string, object>()));
-            rootElement.Render(null, initial: true);
         }
 
         private void Update()
         {
+            if (!built)
+            {
+                var rootElement = Element.Create(rootComponent.Create(), new PropCollection(new Dictionary<string, object>()));
+                Reconciler.CreateElementTree(rootElement);
+                Reconciler.InvokeBuilders(rootElement, this, this.transform);
+
+                built = true;
+            }
+
+            Element.ClearElementCache();
             SystemHook.Prepopulate();
             ScreenSizeHook.Prepopulate();
             MousePositionHook.Prepopulate();

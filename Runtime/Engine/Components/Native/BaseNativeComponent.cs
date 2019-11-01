@@ -1,26 +1,19 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityComponentUI.Engine.Render;
 
 namespace UnityComponentUI.Engine.Components.Native
 {
     public abstract class BaseNativeComponent : IBaseUIComponent
     {
-        public void Render(IRootElementBuilder parent, Element container, int? key = null, bool initial = false)
+        public (List<Element> children, GameObjectElementBuilder builder) Render(Element container, PropCollection props, List<Element> children)
         {
             var builder = new GameObjectElementBuilder(
-                container.Component.Name,
-                container.Path,
-                initial);
+                container.Component.Name);
 
-            this.Render(builder, container.Props);
+            this.Render(builder, props);
 
-            parent?.AddChildBuilder(builder);
-
-            RenderQueue.Instance.Enqueue(new RenderQueueItem
-            {
-                RenderAction = () => builder,
-                Parent = parent,
-            });
+            return (children, builder);
         }
 
         public abstract string Name { get; }

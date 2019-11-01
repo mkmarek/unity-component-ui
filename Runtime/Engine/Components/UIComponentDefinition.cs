@@ -16,9 +16,6 @@ namespace UnityComponentUI.Engine.Components
         [SerializeField]
         private string markup;
 
-        [SerializeField]
-        private string boundSystem;
-
         public string ComponentName
         {
             get => componentName;
@@ -33,17 +30,17 @@ namespace UnityComponentUI.Engine.Components
 
         public UIComponent Create()
         {
-            var state = new Script();
+            return Create(componentName, markup);
+        }
 
-            state.Globals["Create"] = (Func<string, IDictionary<string, object>, string>)Element.Create;
-            state.Globals["UseScreenSize"] = (Func<object>)ScreenSizeHook.Use;
-            state.Globals["UseState"] = (Func<object, IDictionary<string, object>>)StateHook.Use;
-            state.Globals["UseSystem"] = (Func<string, IDictionary<string, object>>)SystemHook.Use;
-            state.Globals["UseMousePosition"] = (Func<IDictionary<string, object>>)MousePositionHook.Use;
+        public static UIComponent Create(string componentName, string markup)
+        {
+            Reconciler.State.DoString(markup);
 
-            state.DoString(markup);
+            Reconciler.State.Globals[$"{componentName}_render"] = Reconciler.State.Globals["render"];
+            Reconciler.State.Globals["render"] = null;
 
-            return new UIComponent(componentName, state);
+            return new UIComponent(componentName, Reconciler.State);
         }
     }
 }

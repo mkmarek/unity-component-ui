@@ -112,6 +112,11 @@ namespace UnityComponentUI.Engine
             return (T)Enum.Parse(typeof(T), strValue);
         }
 
+        public override string ToString()
+        {
+            return $"{{ {string.Join(", ",this.Select(e => $"{e.Key}={e.Value}").ToArray())} }}";
+        }
+
         public override bool Equals(object other)
         {
             if (!(other is PropCollection collection))
@@ -131,7 +136,23 @@ namespace UnityComponentUI.Engine
                     return false;
                 }
 
-                if (!Values.ElementAt(i).Equals(collection.Values.ElementAt(i)))
+                if (Values.ElementAt(i) == null && collection.Values.ElementAt(i) != null)
+                {
+                    return false;
+                }
+
+                if (Values.ElementAt(i) != null && collection.Values.ElementAt(i) == null)
+                {
+                    return false;
+                }
+
+                if (Values.ElementAt(i) == null && collection.Values.ElementAt(i) == null)
+                {
+                    continue;
+                }
+
+                if (!Values.ElementAt(i).Equals(collection.Values.ElementAt(i)) &&
+                    Values.ElementAt(i) != collection.Values.ElementAt(i))
                 {
                     return false;
                 }

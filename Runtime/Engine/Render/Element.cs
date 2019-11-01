@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityComponentUI.Engine.Components;
 
 namespace UnityComponentUI.Engine.Render
@@ -10,38 +11,23 @@ namespace UnityComponentUI.Engine.Render
 
         public IBaseUIComponent Component { get; }
 
-        public PropCollection Props { get; }
+        public PropCollection Props { get; set; }
 
         public string Id { get; }
+        
+        public GameObjectElementBuilder Builder { get; set; }
 
-        public string Path { get; private set; }
+        public List<Element> Children { get; set; }
 
-        private Element(string id, string path, IBaseUIComponent component, PropCollection props = null)
+        public Element Parent { get; set; }
+
+        public bool Invalidated { get; set; }
+
+        private Element(string id, IBaseUIComponent component, PropCollection props = null)
         {
             this.Component = component;
             this.Props = props;
             this.Id = id;
-            this.Path = path;
-        }
-
-        public void SetContainer(Element container)
-        {
-            this.Path = $"{container.Path}|{Path}";
-            PrependPath(this.Path);
-        }
-
-        public void PrependPath(string path)
-        {
-            var childElements = Props.GetElements("children");
-            var index = 0;
-            foreach (var el in childElements)
-            {
-                if (el != null)
-                {
-                    el.Path = $"{path}|{el.Path}|{index++}";
-                    el.PrependPath(el.Path);
-                }
-            }
         }
 
         public static string Create(string name, IDictionary<string, object> props = null)
@@ -49,34 +35,62 @@ namespace UnityComponentUI.Engine.Render
             var id = Guid.NewGuid().ToString();
             var propCollection = new PropCollection(props);
 
+            var children = propCollection.GetElements("children")
+                .Where(e => e != null)
+                .ToList();
             var element = new Element(
                 id,
-                name,
                 ComponentPool.Instance.GetComponentByName(name),
                 propCollection);
 
+            foreach (var child in children)
+            {
+                child.Parent = element;
+            }
+
+            element.Children = children;
             Elements.Add(id, element);
 
             return id;
+        }
+
+        public static void ClearElementCache()
+        {
+            Elements.Clear();
         }
 
         public static Element Create(IBaseUIComponent component, PropCollection props = null)
         {
             var id = "root";
 
-            return new Element(id, id, component, props);
+            return new Element(id, component, props);
         }
 
         public static Element GetById(string id)
         {
             if (string.IsNullOrWhiteSpace(id)) return null;
 
-            return Elements.ContainsKey(id) ? Elements[id] : null;
+            var element = Elements.ContainsKey(id) ? Elements[id] : null;
+
+            return element;
         }
 
-        public void Render(IRootElementBuilder parent, int? key = null, bool initial = false)
+        public void Render()
         {
-            this.Component.Render(parent, this, key, initial);
+            var (children, builder) = this.Component.Render(this, this.Props, this.Children);
+
+            this.Children = children;
+            this.Builder = builder;
+        }
+
+        public Element Clone()
+        {
+            return new Element(this.Id, this.Component, this.Props)
+            {
+                Builder = this.Builder,
+                Children = this.Children,
+                Parent = this.Parent
+            };
         }
     }
 }
