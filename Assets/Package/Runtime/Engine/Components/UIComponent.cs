@@ -1,4 +1,5 @@
-﻿using Assets.Package.Runtime.Engine.Hooks;
+﻿using System.Collections.Generic;
+using Assets.Package.Runtime.Engine.Hooks;
 using UnityComponentUI.Engine.Render;
 using MoonSharp.Interpreter;
 
@@ -16,25 +17,27 @@ namespace UnityComponentUI.Engine.Components
             this.Name = componentName;
         }
 
-        public void Render(IRootElementBuilder parent, Element container, int? key = null, bool initial = false)
+        public (List<Element> children, GameObjectElementBuilder builder) Render(Element container, PropCollection props, List<Element> children)
         {
             HookComponentRegistration.CurrentComponent = this;
-            HookComponentRegistration.CurrentParent = parent;
             HookComponentRegistration.CurrentContainer = container;
-            HookComponentRegistration.CurrentKey = key;
             HookComponentRegistration.ResetHookCounter();
 
-            var elementId = state.Call(state.Globals["render"], container.Props).CastToString();
+            var elementId = state.Call(state.Globals[$"{Name}_render"], props).CastToString();
 
             HookComponentRegistration.CurrentComponent = null;
-            HookComponentRegistration.CurrentParent = null;
             HookComponentRegistration.CurrentContainer = null;
-            HookComponentRegistration.CurrentKey = null;
 
             var element = Element.GetById(elementId);
 
-            element?.SetContainer(container);
-            element?.Render(parent, key, initial);
+            if (element == null)
+            {
+                return (new List<Element>(), null);
+            }
+
+            element.Parent = container;
+
+            return (new List<Element>() {element}, null);
         }
     }
 }

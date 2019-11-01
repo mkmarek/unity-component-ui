@@ -27,8 +27,6 @@ namespace UnityComponentUI.Engine.Components.Native
             }
 
             image.SetProperty(Type, Image.Type.Sliced);
-
-            builder.RenderElements(props.GetElements("children"));
         }
     }
 }

@@ -22,6 +22,14 @@ function render(props)
 		enterState.change("outside")
 	end
 
+	function renderText()
+		if (enterState.value == "inside") then
+			return null
+		end
+
+		return <CounterText y={60} count={enterState.value} />
+	end
+
 	return (
 		<Panel
 			onEnter={enter}
@@ -38,7 +46,7 @@ function render(props)
 			<Button image={"gui"} x={150} y={10} width={50} height={50} onClick={decrement}>
 				<Text textAnchor={"MiddleCenter"} alignByGeometry={"true"} x={0} y={0} width={50} height={50} text={"Minus"}/>
 			</Button>
-			<CounterText y={60} count={enterState.value} />
+			{renderText()}
 			<CounterText y={80} count={"From local state: " .. (counterState.value or "")} />
 			<CounterText y={100} count={"From system: " .. counterSystem.count} />
 		</Panel>

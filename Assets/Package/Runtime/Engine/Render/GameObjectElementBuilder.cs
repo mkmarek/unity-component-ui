@@ -11,21 +11,14 @@ namespace UnityComponentUI.Engine.Render
     public class GameObjectElementBuilder : ElementBuilder, IRootElementBuilder
     {
         protected readonly List<ComponentElementBuilder> components;
-        private readonly List<IRootElementBuilder> childBuilders;
-        private IEnumerable<Element> childElements;
-        private string name;
-        private readonly bool initialRenderer;
-
-        public string Path { get; private set; }
+  
+        public string Name { get; }
         public GameObject RootGameObject { get; private set; }
 
-        public GameObjectElementBuilder(string name, string path, bool initialRenderer) : base(typeof(GameObject))
+        public GameObjectElementBuilder(string name) : base(typeof(GameObject))
         {
             components = new List<ComponentElementBuilder>();
-            childBuilders = new List<IRootElementBuilder>();
-            this.name = name;
-            this.initialRenderer = initialRenderer;
-            Path = path;
+            Name = name;
         }
 
         public ComponentElementBuilder<TComponent> AddComponent<TComponent>()
@@ -50,45 +43,9 @@ namespace UnityComponentUI.Engine.Render
         {
             var previousGameObjectElementBuilder = previousBuilder as GameObjectElementBuilder;
 
-            if (childElements != null)
-            {
-                var elementCount = childElements.Count();
-
-                for (var i = 0; i < elementCount; i++)
-                {
-                    var element = childElements.ElementAt(i);
-                    if (previousGameObjectElementBuilder == null || initialRenderer)
-                    {
-                        element?.Render(this, i, initialRenderer);
-                    }
-                    else if (previousGameObjectElementBuilder.childElements.Count() <= i)
-                    {
-                        element?.Render(this, i, initialRenderer);
-                    }
-                    else if (previousGameObjectElementBuilder.childElements.ElementAt(i)?.Props.Equals(element.Props) != true)
-                    {
-                        element?.Render(this, i, initialRenderer);
-                    }
-                    else
-                    {
-                        if (previousGameObjectElementBuilder.childBuilders.Count <= i)
-                        {
-                            continue;
-                        }
-
-                        var builder = previousGameObjectElementBuilder.childBuilders[i];
-                        RenderQueue.Instance.Enqueue(new RenderQueueItem
-                        {
-                            RenderAction = () => builder,
-                            Parent = this,
-                        });
-                    }
-                }
-            }
-
             RootGameObject = previousGameObjectElementBuilder?.RootGameObject != null
                 ? previousGameObjectElementBuilder?.RootGameObject
-                : new GameObject(Path);
+                : new GameObject(Name);
 
             RootGameObject.transform.SetParent(parent ? parent : pool.Root);
 
@@ -106,56 +63,12 @@ namespace UnityComponentUI.Engine.Render
                 }
             }
 
-            for (var i = 0; i < childBuilders.Count; i++)
-            {
-                var previousChildBuilder = previousGameObjectElementBuilder?.childBuilders.Count <= i
-                    ? null
-                    : previousGameObjectElementBuilder?.childBuilders[i];
-
-                if (childBuilders[i] == null)
-                {
-                    previousChildBuilder?.Destroy(pool);
-                }
-
-                if (childBuilders[i] == null) continue;
-
-                if (childBuilders[i] is NoopElementBuilder)
-                {
-                    childBuilders[i] = previousChildBuilder;
-                }
-            }
-
-            if (previousGameObjectElementBuilder != null)
-            {
-                var currentKeys = childBuilders.Select(e => e.Path).ToList();
-
-                foreach (var builder in previousGameObjectElementBuilder.childBuilders)
-                {
-                    if (!currentKeys.Contains(builder.Path))
-                    {
-                        builder.Destroy(pool);
-                    }
-                }
-            }
-
             return RootGameObject;
         }
 
         public void Destroy(IObjectPool pool)
         {
-            RenderQueue.Instance.DeregisterBuilders(this.Path);
-            HookComponentRegistration.DeregisterComponents(this.Path);
             pool.MarkForDestruction(RootGameObject);
-        }
-
-        public void AddChildBuilder(IRootElementBuilder builder)
-        {
-            childBuilders.Add(builder);
-        }
-
-        public void RenderElements(IEnumerable<Element> elements)
-        {
-            childElements = elements;
         }
     }
 }
