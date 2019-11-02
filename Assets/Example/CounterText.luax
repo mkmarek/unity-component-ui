@@ -1,6 +1,6 @@
 function render(props)
 	return (
-		<Text
+		<text
 			textAnchor={"MiddleCenter"}
 			alignByGeometry={"false"}
 			x={50}

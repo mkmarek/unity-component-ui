@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Package.Runtime.Engine.Hooks;
 using UnityComponentUI.Engine.Components;
 
 namespace UnityComponentUI.Engine.Render
@@ -38,6 +39,14 @@ namespace UnityComponentUI.Engine.Render
             var children = propCollection.GetElements("children")
                 .Where(e => e != null)
                 .ToList();
+
+            var component = ComponentPool.Instance.GetComponentByName(name);
+
+            if (component == null)
+            {
+                throw new InvalidOperationException($"Component {name} not found inside {HookComponentRegistration.CurrentContainer.Component.Name}");
+            }
+
             var element = new Element(
                 id,
                 ComponentPool.Instance.GetComponentByName(name),

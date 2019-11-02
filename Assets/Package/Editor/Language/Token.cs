@@ -31,6 +31,7 @@ namespace UnityComponentUI.Editor.Language
         MINUS = 25,
         PLUS = 26,
         WHITESPACE = 27,
+        TILDA = 28
     }
 
     public class Token
@@ -70,6 +71,7 @@ namespace UnityComponentUI.Editor.Language
                 case TokenKind.DOT: return ".";
                 case TokenKind.MINUS: return "-";
                 case TokenKind.PLUS: return "+";
+                case TokenKind.TILDA: return "~";
                 case TokenKind.WHITESPACE: return value;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(kind), kind, null);

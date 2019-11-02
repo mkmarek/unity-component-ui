@@ -215,6 +215,7 @@ namespace UnityComponentUI.Editor.Language
                 case '*': return this.CreatePunctuationToken(TokenKind.STAR, 1);
                 case '-': return this.CreatePunctuationToken(TokenKind.MINUS, 1);
                 case '+': return this.CreatePunctuationToken(TokenKind.PLUS, 1);
+                case '~': return this.CreatePunctuationToken(TokenKind.TILDA, 1);
                 default: return null;
             }
         }

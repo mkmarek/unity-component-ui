@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: ComponentIndex
   m_EditorClassIdentifier: 
   components:
-  - path: Assets/Example/CounterText.luax
-    component: {fileID: -6750239444755058063, guid: 61ace1cee9cd1504e9499fe0857aadd6,
-      type: 3}
   - path: Assets/Example/Counter.luax
     component: {fileID: -6750239444755058063, guid: 9cdc0894ab8b4ec4580b1f1b2d1c077b,
+      type: 3}
+  - path: Assets/Example/CounterText.luax
+    component: {fileID: -6750239444755058063, guid: 61ace1cee9cd1504e9499fe0857aadd6,
       type: 3}

@@ -29,9 +29,9 @@ function render(props)
 
 		return <CounterText y={60} count={enterState.value} />
 	end
-
+	
 	return (
-		<Panel
+		<panel
 			onEnter={enter}
 			onLeave={leave}
 			x={screenSize.width / 2 - 150}
@@ -40,15 +40,15 @@ function render(props)
 			width={300}
 			height={300}>
 
-			<Button image={"gui"} x={90} y={10} width={50} height={50} onClick={increment}>
-				<Text textAnchor={"MiddleCenter"} alignByGeometry={"true"} x={0} y={0} width={50} height={50} text={"Plus"}/>
-			</Button>
-			<Button image={"gui"} x={150} y={10} width={50} height={50} onClick={decrement}>
-				<Text textAnchor={"MiddleCenter"} alignByGeometry={"true"} x={0} y={0} width={50} height={50} text={"Minus"}/>
-			</Button>
+			<button image={"gui"} x={90} y={10} width={50} height={50} onClick={increment}>
+				<text textAnchor={"MiddleCenter"} alignByGeometry={"true"} x={0} y={0} width={50} height={50} text={"Plus"}/>
+			</button>
+			<button image={"gui"} x={150} y={10} width={50} height={50} onClick={decrement}>
+				<text textAnchor={"MiddleCenter"} alignByGeometry={"true"} x={0} y={0} width={50} height={50} text={"Minus"}/>
+			</button>
 			{renderText()}
 			<CounterText y={80} count={"From local state: " .. (counterState.value or "")} />
 			<CounterText y={100} count={"From system: " .. counterSystem.count} />
-		</Panel>
+		</panel>
 	)
 end
