@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace UnityComponentUI.Engine.Components.Native
 {
-    [NativeComponentRegistration("Button")]
+    [NativeComponentRegistration("button")]
     public class ButtonComponent : BaseLayoutComponent
     {
         private static readonly Expression<Func<Image, Sprite>> Sprite = e => e.sprite;

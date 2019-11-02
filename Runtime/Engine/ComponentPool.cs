@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using UnityComponentUI.Engine.Components;
 using UnityComponentUI.Engine.Components.Native;
-using UnityEditorInternal;
 
 namespace UnityComponentUI.Engine
 {

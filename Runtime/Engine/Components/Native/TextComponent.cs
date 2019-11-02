@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace UnityComponentUI.Engine.Components.Native
 {
-    [NativeComponentRegistration("Text")]
+    [NativeComponentRegistration("text")]
     public class TextComponent : BaseLayoutComponent
     {
         private static readonly Expression<Func<Text, Font>> Font = e => e.font;

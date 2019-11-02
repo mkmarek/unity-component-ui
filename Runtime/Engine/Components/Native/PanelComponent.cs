@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace UnityComponentUI.Engine.Components.Native
 {
-    [NativeComponentRegistration("Panel")]
+    [NativeComponentRegistration("panel")]
     public class PanelComponent : BaseLayoutComponent
     {
         private static readonly Expression<Func<Image, Sprite>> Sprite = e => e.sprite;
